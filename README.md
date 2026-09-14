@@ -1,48 +1,63 @@
-# POE 璇嶇紑搴?
-娴佹斁涔嬭矾锛圥OE锛夎瘝缂€閫熸煡宸ュ叿銆傚崟鏂囦欢搴旂敤锛岄浂渚濊禆锛岄儴缃插埌 Cloudflare Pages銆?
-- 绾夸笂鐗堬細https://poe-affix.pages.dev
-- 浠撳簱锛歨ttps://github.com/pxhzaii/poe
+# POE 词缀库
 
-## 鍔熻兘
+流放之路（POE）词缀速查工具。单文件应用，零依赖，部署到 Cloudflare Pages。
 
-- 璇嶇紑鍗＄墖锛氬悕绉颁笌鏁板€煎苟鍒楋紝鐐瑰嚮鍗冲彲澶嶅埗
-- 鍒嗙被瀹屽叏鑷畾涔夛細濡傘€岃礋鐢电敳/鍙敜琛ｃ€嶃€屾硶琛€/鎴掓寚銆?- 鏈湴鎸佷箙鍖栵細鏁版嵁鑷姩瀛?localStorage
-- 瀵煎叆瀵煎嚭锛欽SON 鏍煎紡
-- 浜戠鍚屾锛氫袱涓寜閽紝鎺ㄩ€?鎷夊彇锛屽瘑鐮佷繚鎶?
-## 浣跨敤鏂规硶
+- 线上版：https://poe-affix.pages.dev
+- 仓库：https://github.com/pxhzaii/poe
 
-1. 鎵撳紑绾夸笂鐗堬紝鎴栦笅杞?`index.html` 鍙屽嚮鐢ㄦ祻瑙堝櫒鎵撳紑
-2. 鐐瑰嚮銆屾坊鍔犺瘝缂€銆嶁啋 濉垎绫汇€佸悕绉般€佹暟鍊?鈫?淇濆瓨
-3. 鐐瑰嚮鍗＄墖涓婄殑鍚嶇О鎴栨暟鍊煎嵆鍙鍒?
-## 浜戝悓姝?
-**涓や釜鎸夐挳 + 瀵嗙爜杈撳叆妗嗭紝鏃犻渶鍏朵粬閰嶇疆锛?*
+## 功能
 
-1. 鍦ㄥ瘑鐮佽緭鍏ユ杈撳叆鍚屾瀵嗙爜锛堟祻瑙堝櫒鑷姩璁颁綇锛屼笅娆℃墦寮€涓嶇敤閲嶅～锛?2. **鈽侊笍 鎺ㄩ€佷簯绔?*锛氭妸褰撳墠璇嶇紑鎺ㄩ€佸埌 GitHub Gist 澶囦唤
-3. **猬囷笍 鎷夊彇浜戠**锛氱敤浜戠鏁版嵁瑕嗙洊鏈湴
+- 词缀卡片：名称与数值并列，点击即可复制
+- 分类完全自定义：如「负电甲/召唤衣」「法血/戒指」
+- 本地持久化：数据自动存 localStorage
+- 导入导出：JSON 格式
+- 云端同步：两个按钮，推送/拉取，密码保护
 
-瀵嗙爜閫氳繃璇锋眰澶?`X-Sync-Key` 浼犵粰鏈嶅姟绔紝鏈嶅姟绔牎楠岀幆澧冨彉閲?`SYNC_KEY`锛屼笉鍖归厤杩斿洖 401銆?
-GitHub Token 鍜屽悓姝ュ瘑鐮佸潎鐢辨湇鍔＄锛圕loudflare Pages 鐜鍙橀噺锛変繚绠★紝鍓嶇涓嶆帴瑙︿换浣曞嚟鎹€侴ist 鑷姩鍒涘缓鍜岀鐞嗭紝鐢ㄦ埛鏃犳劅鐭ャ€?
-鏈湴鏂囦欢妯″紡锛堝弻鍑?index.html锛変笉鏀寔浜戝悓姝ワ紝璇蜂娇鐢ㄧ嚎涓婄増銆?
-## 閮ㄧ讲锛圕loudflare Pages锛?
-浠撳簱鍐呯疆 GitHub Actions 鑷姩閮ㄧ讲锛屾帹閫?main 鍒嗘敮鎴栨墜鍔ㄨЕ鍙戝嵆鍙€?
-闇€瑕佸湪浠撳簱 Settings 鈫?Secrets 鈫?Actions 閰嶇疆 4 涓?secrets锛?
-| Secret | 璇存槑 |
+## 使用方法
+
+1. 打开线上版，或下载 `index.html` 双击用浏览器打开
+2. 点击「添加词缀」→ 填分类、名称、数值 → 保存
+3. 点击卡片上的名称或数值即可复制
+
+## 云同步
+
+**两个按钮 + 密码输入框，无需其他配置：**
+
+1. 在密码输入框输入同步密码（浏览器自动记住，下次打开不用重填）
+2. **☁️ 推送云端**：把当前词缀推送到 GitHub Gist 备份
+3. **⬇️ 拉取云端**：用云端数据覆盖本地
+
+密码通过请求头 `X-Sync-Key` 传给服务端，服务端校验环境变量 `SYNC_KEY`，不匹配返回 401。
+
+GitHub Token 和同步密码均由服务端（Cloudflare Pages 环境变量）保管，前端不接触任何凭据。Gist 自动创建和管理，用户无感知。
+
+本地文件模式（双击 index.html）不支持云同步，请使用线上版。
+
+## 部署（Cloudflare Pages）
+
+仓库内置 GitHub Actions 自动部署，推送 main 分支或手动触发即可。
+
+需要在仓库 Settings → Secrets → Actions 配置 4 个 secrets：
+
+| Secret | 说明 |
 |--------|------|
-| `CF_API_TOKEN` | Cloudflare API Token锛圥ages 鏉冮檺锛?|
-| `CF_ACCOUNT_ID` | Cloudflare 璐︽埛 ID |
-| `GIST_TOKEN` | GitHub Token锛坓ist 鏉冮檺锛屽啓鍏?Pages 鐜鍙橀噺锛?|
-| `SYNC_KEY` | 鍚屾瀵嗙爜锛屽啓鍏?Pages 鐜鍙橀噺锛屾牎楠屽墠绔姹傚ご |
+| `CF_API_TOKEN` | Cloudflare API Token（Pages 权限） |
+| `CF_ACCOUNT_ID` | Cloudflare 账户 ID |
+| `GIST_TOKEN` | GitHub Token（gist 权限，写入 Pages 环境变量） |
+| `SYNC_KEY` | 同步密码，写入 Pages 环境变量，校验前端请求头 |
 
-宸ヤ綔娴佽嚜鍔細鍒涘缓 Pages 椤圭洰 鈫?鍐欏叆鐜鍙橀噺锛圙IST_TOKEN + SYNC_KEY锛夆啋 閮ㄧ讲 鈫?楠岃瘉銆?
-## 鏁版嵁鏍煎紡
+工作流自动：创建 Pages 项目 → 写入环境变量（GIST_TOKEN + SYNC_KEY）→ 部署 → 验证。
+
+## 数据格式
 
 ```json
 [
-  { "id": "xxx", "category": "璐熺數鐢?鍙敜琛?, "name": "璇嶇紑鍚嶇О", "value": "鏁板€? }
+  { "id": "xxx", "category": "负电甲/召唤衣", "name": "词缀名称", "value": "数值" }
 ]
 ```
 
-Gist 鏂囦欢 `poe-affix-data.json` 鍐呭锛?
+Gist 文件 `poe-affix-data.json` 内容：
+
 ```json
 { "affixes": [...], "updated_at": "2026-01-01T00:00:00.000Z" }
 ```
