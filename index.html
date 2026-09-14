@@ -298,74 +298,64 @@
             color: #ff9aa8;
         }
 
-        /* ========== 名称 + 数值 并列容器 ========== */
+        /* ========== 词缀行容器 ========== */
         .affix-content {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.4rem;
             margin-top: 0.2rem;
         }
 
-        /* 通用复制项样式（名称与数值完全一致） */
-        .copy-item {
+        /* 单条词缀行：名称 + 数值 横排 */
+        .affix-row {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             background: #1a212c;
             border: 1px solid #2b3546;
             border-radius: 10px;
-            padding: 0.6rem 0.8rem;
+            padding: 0.5rem 0.8rem;
             cursor: pointer;
             transition: all 0.12s;
             user-select: none;
-            position: relative;
         }
 
-        .copy-item:hover {
+        .affix-row:hover {
             background: #212c3b;
             border-color: #a58e4a;
             box-shadow: 0 0 10px rgba(201, 181, 120, 0.15);
         }
 
-        .copy-item:active {
+        .affix-row:active {
             transform: scale(0.995);
-            background: #283545;
         }
 
-        /* 内容文字 */
-        .copy-item-text {
+        .affix-row .affix-name {
             flex: 1;
-            font-size: 1rem;
-            font-weight: 400;
-            letter-spacing: 0.3px;
-            color: #e3e6ed;
+            font-size: 0.95rem;
+            font-weight: 450;
+            color: #f0e6d2;
             word-break: break-word;
             line-height: 1.4;
         }
 
-        /* 复制小图标 */
-        .copy-item-icon {
-            font-size: 0.9rem;
-            opacity: 0.4;
-            transition: opacity 0.12s, color 0.12s;
+        .affix-row .affix-value {
             flex-shrink: 0;
-        }
-
-        .copy-item:hover .copy-item-icon {
-            opacity: 1;
-            color: #c9b578;
-        }
-
-        /* 名称特殊一点：让它不至于完全一样，但同样大小 */
-        .copy-item.name .copy-item-text {
-            color: #f0e6d2;
-            font-weight: 450;
-        }
-
-        .copy-item.value .copy-item-text {
             font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #f0e6d2;
+            white-space: nowrap;
+        }
+
+        .affix-row .affix-copy-icon {
+            font-size: 0.8rem;
+            opacity: 0.3;
+            flex-shrink: 0;
+            transition: opacity 0.12s;
+        }
+
+        .affix-row:hover .affix-copy-icon {
+            opacity: 1;
         }
 
         /* 空状态 */
@@ -558,7 +548,7 @@
         <!-- 统计 -->
         <div class="stats-bar">
             <span id="affixCount">共 0 条词缀</span>
-            <span style="font-size:0.78rem; color:#5b6a80;">数据保存在本地浏览器 · 点击名称或数值均可复制</span>
+            <span style="font-size:0.78rem; color:#5b6a80;">数据保存在本地浏览器 · 点击词缀行即可复制整行</span>
         </div>
 
         <!-- 词缀网格 -->
@@ -735,34 +725,37 @@
                 return div.innerHTML;
             }
 
-            function createCopyItem(text, type) {
-                const item = document.createElement('div');
-                item.className = `copy-item ${type}`;
-                item.title = `点击复制${type === 'name' ? '名称' : '数值'}`;
+            function createAffixRow(name, value) {
+                const row = document.createElement('div');
+                row.className = 'affix-row';
+                row.title = `点击复制：${name} ${value}`;
 
-                const textEl = document.createElement('span');
-                textEl.className = 'copy-item-text';
-                textEl.textContent = text;
+                const nameEl = document.createElement('span');
+                nameEl.className = 'affix-name';
+                nameEl.textContent = name;
+
+                const valueEl = document.createElement('span');
+                valueEl.className = 'affix-value';
+                valueEl.textContent = value;
 
                 const iconEl = document.createElement('span');
-                iconEl.className = 'copy-item-icon';
+                iconEl.className = 'affix-copy-icon';
                 iconEl.textContent = '📋';
 
-                item.appendChild(textEl);
-                item.appendChild(iconEl);
+                row.appendChild(nameEl);
+                row.appendChild(valueEl);
+                row.appendChild(iconEl);
 
-                item.addEventListener('click', async (e) => {
+                row.addEventListener('click', async (e) => {
                     e.stopPropagation();
+                    const text = `${name} ${value}`;
                     const ok = await copyToClipboard(text);
                     if (ok) {
-                        showToast(
-                            text,
-                            type === 'name' ? '📋 已复制名称' : '📋 已复制数值'
-                        );
+                        showToast(text, '📋 已复制');
                     }
                 });
 
-                return item;
+                return row;
             }
 
             // ---------- 云同步（服务端 /api/gist/data，无需任何配置） ----------
@@ -878,10 +871,22 @@
                     return;
                 }
 
+                // 按分类分组
+                const groups = {};
+                const groupOrder = [];
                 filtered.forEach(item => {
+                    const cat = item.category || '未分类';
+                    if (!groups[cat]) {
+                        groups[cat] = [];
+                        groupOrder.push(cat);
+                    }
+                    groups[cat].push(item);
+                });
+
+                groupOrder.forEach(cat => {
+                    const items = groups[cat];
                     const card = document.createElement('div');
                     card.className = 'affix-card';
-                    card.dataset.id = item.id;
 
                     // 头部：分类 + 操作按钮
                     const cardHeader = document.createElement('div');
@@ -889,49 +894,59 @@
 
                     const catEl = document.createElement('span');
                     catEl.className = 'affix-category';
-                    catEl.textContent = item.category || '未分类';
-                    catEl.title = item.category || '未分类';
+                    catEl.textContent = cat;
+                    catEl.title = cat;
 
-                    const actions = document.createElement('div');
-                    actions.className = 'card-actions';
+                    const headerRight = document.createElement('div');
+                    headerRight.style.display = 'flex';
+                    headerRight.style.alignItems = 'center';
+                    headerRight.style.gap = '0.3rem';
 
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'icon-btn edit';
-                    editBtn.title = '编辑';
-                    editBtn.innerHTML = '✏️';
-                    editBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        startEdit(item.id);
-                    });
+                    const countEl = document.createElement('span');
+                    countEl.style.fontSize = '0.72rem';
+                    countEl.style.color = '#5b6a80';
+                    countEl.textContent = items.length + ' 条';
 
-                    const delBtn = document.createElement('button');
-                    delBtn.className = 'icon-btn delete';
-                    delBtn.title = '删除';
-                    delBtn.innerHTML = '🗑️';
-                    delBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        deleteAffix(item.id);
-                    });
-
-                    actions.appendChild(editBtn);
-                    actions.appendChild(delBtn);
+                    headerRight.appendChild(countEl);
 
                     cardHeader.appendChild(catEl);
-                    cardHeader.appendChild(actions);
+                    cardHeader.appendChild(headerRight);
 
-                    // ========== 名称 + 数值 并列 ==========
                     const contentWrap = document.createElement('div');
                     contentWrap.className = 'affix-content';
 
-                    const nameItem = createCopyItem(item.name, 'name');
-                    const valueItem = createCopyItem(item.value, 'value');
+                    items.forEach(item => {
+                        const row = createAffixRow(item.name, item.value || '');
 
-                    contentWrap.appendChild(nameItem);
-                    contentWrap.appendChild(valueItem);
+                        // 编辑按钮
+                        const editBtn = document.createElement('button');
+                        editBtn.className = 'icon-btn edit';
+                        editBtn.title = '编辑';
+                        editBtn.innerHTML = '✏️';
+                        editBtn.style.flexShrink = '0';
+                        editBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            startEdit(item.id);
+                        });
+
+                        // 删除按钮
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'icon-btn delete';
+                        delBtn.title = '删除';
+                        delBtn.innerHTML = '🗑️';
+                        delBtn.style.flexShrink = '0';
+                        delBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            deleteAffix(item.id);
+                        });
+
+                        row.appendChild(editBtn);
+                        row.appendChild(delBtn);
+                        contentWrap.appendChild(row);
+                    });
 
                     card.appendChild(cardHeader);
                     card.appendChild(contentWrap);
-
                     grid.appendChild(card);
                 });
             }
