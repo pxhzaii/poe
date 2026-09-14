@@ -13,8 +13,8 @@
         }
 
         body {
-            background: #0b0e14;
-            color: #e3e6ed;
+            background: #f5f7fa;
+            color: #2c3e50;
             padding: 2rem 1.5rem;
             min-height: 100vh;
             display: flex;
@@ -35,16 +35,15 @@
             flex-wrap: wrap;
             gap: 1rem;
             margin-bottom: 1.8rem;
-            border-bottom: 1px solid #2a2f3a;
+            border-bottom: 1px solid #dce3ec;
             padding-bottom: 1rem;
         }
 
         .header h1 {
-            font-weight: 400;
+            font-weight: 500;
             font-size: 1.6rem;
             letter-spacing: 1px;
-            color: #c9b578;
-            text-shadow: 0 0 6px rgba(201, 181, 120, 0.3);
+            color: #2563eb;
         }
 
         .header-actions {
@@ -55,9 +54,9 @@
 
         /* 通用按钮 */
         .btn {
-            background: #1e2530;
-            border: 1px solid #2e3848;
-            color: #c3cddf;
+            background: #ffffff;
+            border: 1px solid #d0d9e6;
+            color: #4a5568;
             padding: 0.5rem 1.1rem;
             border-radius: 30px;
             font-size: 0.88rem;
@@ -71,43 +70,44 @@
         }
 
         .btn:hover {
-            background: #2a3442;
-            border-color: #4d6180;
-            color: #eaf0ff;
+            background: #f0f5ff;
+            border-color: #93b4e8;
+            color: #2563eb;
         }
 
         .btn-primary {
-            background: #2f4155;
-            border-color: #a58e4a;
-            color: #f2e9d8;
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
         }
 
         .btn-primary:hover {
-            background: #3c5168;
-            border-color: #c9b578;
-            box-shadow: 0 0 12px rgba(201, 181, 120, 0.25);
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #ffffff;
         }
 
         .btn-danger {
-            background: #2a1e22;
-            border-color: #5e3038;
-            color: #e0a8b0;
+            background: #ffffff;
+            border-color: #e8a0a0;
+            color: #c04848;
         }
 
         .btn-danger:hover {
-            background: #3d262c;
-            border-color: #8a4550;
-            color: #ffc8d0;
+            background: #fef0f0;
+            border-color: #c04848;
+            color: #c04848;
         }
 
         /* 添加表单 */
         .add-form {
-            background: #10161f;
-            border: 1px solid #232b37;
+            background: #ffffff;
+            border: 1px solid #dce3ec;
             border-radius: 16px;
             padding: 1.2rem 1.2rem 1rem;
             margin-bottom: 1.8rem;
             display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
         .add-form.show {
@@ -116,9 +116,9 @@
 
         .form-title {
             font-size: 0.95rem;
-            color: #c9b578;
+            color: #2563eb;
             margin-bottom: 0.9rem;
-            font-weight: 400;
+            font-weight: 500;
             letter-spacing: 0.5px;
         }
 
@@ -138,16 +138,16 @@
 
         .form-group label {
             font-size: 0.75rem;
-            color: #7e8b9f;
+            color: #8a96a8;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
         .form-group input,
         .form-group select {
-            background: #181f2b;
-            border: 1px solid #2b3546;
-            color: #e3e6ed;
+            background: #f8fafc;
+            border: 1px solid #d0d9e6;
+            color: #2c3e50;
             padding: 0.55rem 0.9rem;
             border-radius: 30px;
             font-size: 0.92rem;
@@ -157,12 +157,12 @@
 
         .form-group input:focus,
         .form-group select:focus {
-            border-color: #a58e4a;
-            box-shadow: 0 0 8px rgba(201, 181, 120, 0.2);
+            border-color: #2563eb;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
         }
 
         .form-group input::placeholder {
-            color: #4f5d72;
+            color: #a0afc0;
         }
 
         .form-actions {
@@ -181,9 +181,9 @@
         }
 
         .filter-btn {
-            background: #181f2b;
-            border: 1px solid #2b3546;
-            color: #b3bed5;
+            background: #ffffff;
+            border: 1px solid #d0d9e6;
+            color: #4a5568;
             padding: 0.45rem 1.2rem;
             border-radius: 30px;
             font-size: 0.88rem;
@@ -194,34 +194,33 @@
         }
 
         .filter-btn:hover {
-            background: #1f2a38;
-            border-color: #4d6180;
-            color: #dee8ff;
+            background: #f0f5ff;
+            border-color: #93b4e8;
+            color: #2563eb;
         }
 
         .filter-btn.active {
-            background: #2f4155;
-            border-color: #a58e4a;
-            color: #f2e9d8;
-            box-shadow: 0 0 10px rgba(201, 181, 120, 0.2);
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
         }
 
         .filter-btn.filter-add {
             border-style: dashed;
-            color: #7fbf7f;
-            border-color: #3a5a3a;
+            color: #16a34a;
+            border-color: #86d9a8;
         }
 
         .filter-btn.filter-add:hover {
-            background: #1a2e1a;
-            border-color: #5a8a5a;
-            color: #9fdf9f;
+            background: #f0fdf4;
+            border-color: #16a34a;
+            color: #16a34a;
         }
 
         /* 统计 */
         .stats-bar {
             font-size: 0.85rem;
-            color: #6b7a92;
+            color: #8a96a8;
             margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
@@ -238,20 +237,20 @@
 
         /* 卡片 */
         .affix-card {
-            background: #10161f;
-            border: 1px solid #232b37;
+            background: #ffffff;
+            border: 1px solid #dce3ec;
             border-radius: 14px;
             padding: 1rem 1rem 1rem;
             transition: border 0.15s, background 0.15s;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
             position: relative;
         }
 
         .affix-card:hover {
-            border-color: #3c4b5e;
-            background: #121a24;
+            border-color: #93b4e8;
+            background: #fcfdff;
         }
 
         .affix-card-header {
@@ -265,9 +264,9 @@
             font-size: 0.68rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #7e8b9f;
-            font-weight: 500;
-            background: #1a212c;
+            color: #8a96a8;
+            font-weight: 600;
+            background: #eef2f8;
             padding: 0.2rem 0.7rem;
             border-radius: 20px;
             max-width: 60%;
@@ -291,7 +290,7 @@
         .icon-btn {
             background: transparent;
             border: none;
-            color: #6b7a92;
+            color: #a0afc0;
             cursor: pointer;
             font-size: 0.95rem;
             padding: 0.25rem 0.4rem;
@@ -301,13 +300,13 @@
         }
 
         .icon-btn:hover {
-            background: #1f2a38;
-            color: #e3e6ed;
+            background: #eef2f8;
+            color: #2563eb;
         }
 
         .icon-btn.delete:hover {
-            background: #3d262c;
-            color: #ff9aa8;
+            background: #fef0f0;
+            color: #c04848;
         }
 
         /* ========== 词缀行容器 ========== */
@@ -323,8 +322,8 @@
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            background: #1a212c;
-            border: 1px solid #2b3546;
+            background: #f8fafc;
+            border: 1px solid #e4e9f0;
             border-radius: 10px;
             padding: 0.5rem 0.8rem;
             cursor: pointer;
@@ -333,9 +332,9 @@
         }
 
         .affix-row:hover {
-            background: #212c3b;
-            border-color: #a58e4a;
-            box-shadow: 0 0 10px rgba(201, 181, 120, 0.15);
+            background: #f0f5ff;
+            border-color: #93b4e8;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.1);
         }
 
         .affix-row:active {
@@ -345,8 +344,8 @@
         .affix-row .affix-name {
             flex: 1;
             font-size: 0.95rem;
-            font-weight: 450;
-            color: #f0e6d2;
+            font-weight: 500;
+            color: #2c3e50;
             word-break: break-word;
             line-height: 1.4;
         }
@@ -355,7 +354,7 @@
             flex-shrink: 0;
             font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
             font-size: 0.9rem;
-            color: #8a9aaf;
+            color: #8a96a8;
             white-space: nowrap;
         }
 
@@ -375,10 +374,10 @@
             grid-column: 1 / -1;
             text-align: center;
             padding: 3rem 1rem;
-            color: #5b6a80;
-            border: 1px dashed #2b3546;
+            color: #a0afc0;
+            border: 1px dashed #d0d9e6;
             border-radius: 20px;
-            background: #0e131b;
+            background: #ffffff;
             font-size: 1rem;
             line-height: 1.8;
         }
@@ -389,14 +388,14 @@
             top: 30px;
             left: 50%;
             transform: translateX(-50%) scale(0.95);
-            background: #2a3b4c;
-            color: #e0e9ff;
+            background: #2563eb;
+            color: #ffffff;
             padding: 0.7rem 1.8rem;
             border-radius: 40px;
             font-size: 0.95rem;
             letter-spacing: 0.3px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
-            border: 1px solid #4a6180;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+            border: 1px solid #1d4ed8;
             opacity: 0;
             transition: opacity 0.15s, transform 0.15s;
             pointer-events: none;
@@ -415,18 +414,17 @@
         /* 底部 */
         .footer-note {
             margin-top: 2.5rem;
-            color: #4b5a70;
+            color: #a0afc0;
             font-size: 0.78rem;
             text-align: center;
-            border-top: 1px solid #1d2530;
+            border-top: 1px solid #dce3ec;
             padding-top: 1.5rem;
             line-height: 1.8;
         }
 
-        /* 同步密码输入框 */
         .sync-key-input:focus {
-            border-color: #a58e4a;
-            box-shadow: 0 0 8px rgba(201, 181, 120, 0.2);
+            border-color: #2563eb;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
         }
 
         /* KV 面板 */
@@ -519,7 +517,7 @@
             <h1>⚔️ 流放之路 · 我的词缀库</h1>
             <div class="header-actions">
                 <button class="btn btn-primary" id="toggleAddForm">➕ 添加词缀</button>
-                <input type="password" id="syncKeyInput" class="sync-key-input" placeholder="同步密码" autocomplete="off" style="width:90px;height:36px;border-radius:30px;border:1px solid #2b3546;background:#181f2b;color:#e3e6ed;padding:0 0.8rem;font-size:0.82rem;outline:none;">
+                <input type="password" id="syncKeyInput" class="sync-key-input" placeholder="同步密码" autocomplete="off" style="width:90px;height:36px;border-radius:30px;border:1px solid #d0d9e6;background:#f8fafc;color:#2c3e50;padding:0 0.8rem;font-size:0.82rem;outline:none;">
                 <button class="btn" id="pushCloudBtn" title="把当前词缀推送到云端备份">☁️ 推送云端</button>
                 <button class="btn" id="pullCloudBtn" title="用云端数据覆盖本地">⬇️ 拉取云端</button>
                 <button class="btn" id="exportBtn">📤 导出</button>
@@ -535,8 +533,8 @@
                 <div class="form-group">
                     <label>分类</label>
                     <div style="display:flex;gap:0.4rem;">
-                        <select id="inputCategorySelect" style="flex:1;background:#181f2b;border:1px solid #2b3546;color:#e3e6ed;padding:0.5rem 0.7rem;border-radius:30px;font-size:0.88rem;outline:none;cursor:pointer;"></select>
-                        <input type="text" id="inputCategory" placeholder="新建分类" autocomplete="off" style="width:120px;background:#181f2b;border:1px solid #2b3546;color:#e3e6ed;padding:0.5rem 0.9rem;border-radius:30px;font-size:0.82rem;outline:none;">
+                        <select id="inputCategorySelect" style="flex:1;background:#f8fafc;border:1px solid #d0d9e6;color:#2c3e50;padding:0.5rem 0.7rem;border-radius:30px;font-size:0.88rem;outline:none;cursor:pointer;"></select>
+                        <input type="text" id="inputCategory" placeholder="新建分类" autocomplete="off" style="width:120px;background:#f8fafc;border:1px solid #d0d9e6;color:#2c3e50;padding:0.5rem 0.9rem;border-radius:30px;font-size:0.82rem;outline:none;">
                     </div>
                 </div>
                 <div class="form-group" style="flex: 2 0 200px;">
@@ -562,7 +560,7 @@
         <!-- 统计 -->
         <div class="stats-bar">
             <span id="affixCount">共 0 条词缀</span>
-            <span style="font-size:0.78rem; color:#5b6a80;">数据保存在本地浏览器 · 点击词缀行即可复制整行</span>
+            <span style="font-size:0.78rem; color:#8a96a8;">数据保存在本地浏览器 · 点击词缀行即可复制名称</span>
         </div>
 
         <!-- 词缀网格 -->
