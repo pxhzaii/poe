@@ -30,9 +30,9 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/poe-affix" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" || true)
           if [ "$CODE" = "200" ]; then
-            echo "Pages 项目 poe-affix 已存在"
+            echo "Pages 椤圭洰 poe-affix 宸插瓨鍦?
           else
-            echo "创建 Pages 项目 poe-affix..."
+            echo "鍒涘缓 Pages 椤圭洰 poe-affix..."
             curl -sS -m 30 -X POST \
               "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
@@ -40,9 +40,9 @@ jobs:
               -d '{"name":"poe-affix","production_branch":"main"}' | node -e '
               let i="";process.stdin.on("data",c=>i+=c);process.stdin.on("end",()=>{
                 try{const j=JSON.parse(i);
-                  if(!j.success){console.log("创建失败: "+JSON.stringify(j.errors));process.exit(1);}
-                  else{console.log("创建成功: "+j.result.name);}
-                }catch(e){console.log("响应异常:"+i.slice(0,300));process.exit(1);}
+                  if(!j.success){console.log("鍒涘缓澶辫触: "+JSON.stringify(j.errors));process.exit(1);}
+                  else{console.log("鍒涘缓鎴愬姛: "+j.result.name);}
+                }catch(e){console.log("鍝嶅簲寮傚父:"+i.slice(0,300));process.exit(1);}
               })'
           fi
 
@@ -53,6 +53,13 @@ jobs:
         run: |
           echo "${{ secrets.GIST_TOKEN }}" | npx wrangler pages secret put GIST_TOKEN --project-name poe-affix
 
+      - name: Set Pages secret (SYNC_KEY)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "${{ secrets.SYNC_KEY }}" | npx wrangler pages secret put SYNC_KEY --project-name poe-affix
+
       - name: Deploy Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
@@ -62,15 +69,22 @@ jobs:
           npx wrangler pages deploy . --project-name poe-affix --commit-dirty=true
 
       - name: Verify deployment
+        env:
+          SYNC_KEY: ${{ secrets.SYNC_KEY }}
         run: |
-          echo "=== 等待部署生效 ==="
+          echo "=== 绛夊緟閮ㄧ讲鐢熸晥 ==="
           sleep 30
-          echo "--- Pages 首页 ---"
+          echo "--- Pages 棣栭〉 ---"
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev" || true
-          echo "--- /api/gist/data GET（应返回 JSON） ---"
-          curl -sS -m 30 "https://poe-affix.pages.dev/api/gist/data" | head -c 200 || true
+          echo "--- /api/gist/data GET 鏃犲瘑鐮侊紙搴旇繑鍥?401锛?---"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev/api/gist/data" || true
+          echo "--- /api/gist/data GET 甯﹀瘑鐮侊紙搴旇繑鍥?JSON锛?---"
+          curl -sS -m 30 "https://poe-affix.pages.dev/api/gist/data" \
+            -H "X-Sync-Key: $SYNC_KEY" | head -c 200 || true
           echo ""
-          echo "--- /api/gist/data POST（写空数组测试） ---"
+          echo "--- /api/gist/data POST 甯﹀瘑鐮侊紙鍐欑┖鏁扮粍娴嬭瘯锛?---"
           curl -sS -m 30 -X POST "https://poe-affix.pages.dev/api/gist/data" \
-            -H "Content-Type: application/json" -d '{"affixes":[]}' | head -c 200 || true
+            -H "Content-Type: application/json" \
+            -H "X-Sync-Key: $SYNC_KEY" \
+            -d '{"affixes":[]}' | head -c 200 || true
           echo ""
