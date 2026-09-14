@@ -511,7 +511,8 @@
             <h1>⚔️ 流放之路 · 我的词缀库</h1>
             <div class="header-actions">
                 <button class="btn btn-primary" id="toggleAddForm">➕ 添加词缀</button>
-                <button class="btn" id="kvPanelBtn">☁️ Gist 云同步</button>
+                <button class="btn" id="pushCloudBtn" title="把当前词缀推送到云端备份">☁️ 推送云端</button>
+                <button class="btn" id="pullCloudBtn" title="用云端数据覆盖本地">⬇️ 拉取云端</button>
                 <button class="btn" id="exportBtn">📤 导出</button>
                 <button class="btn" id="importBtn">📥 导入</button>
                 <button class="btn btn-danger" id="clearAllBtn">🗑️ 清空</button>
@@ -542,33 +543,6 @@
             </div>
         </div>
 
-        <!-- Gist 云同步面板 -->
-        <div class="kv-panel" id="kvPanel">
-            <div class="kv-title">☁️ GitHub Gist 云同步（AES 加密）</div>
-            <div class="kv-row">
-                <div class="kv-field">
-                    <label>GitHub Token（需 gist 权限；线上版可留空，由服务端保管）</label>
-                    <input type="password" id="kvToken" placeholder="ghp_...（线上部署留空）" autocomplete="off">
-                </div>
-                <div class="kv-field">
-                    <label>Gist ID（首次留空，推送时自动创建）</label>
-                    <input type="text" id="kvGistId" placeholder="如 6f37735690f82410a1b164ed7678bf45" autocomplete="off">
-                </div>
-            </div>
-            <div class="kv-row">
-                <div class="kv-field">
-                    <label>同步密钥（拉取/推送都需要，未授权者无法读写）</label>
-                    <input type="password" id="kvPassphrase" placeholder="同步密码" autocomplete="off">
-                </div>
-            </div>
-            <div class="kv-actions">
-                <button class="btn btn-primary" id="kvSaveBtn">💾 保存配置</button>
-                <button class="btn" id="kvPullBtn">⬇️ 从云端拉取</button>
-                <button class="btn" id="kvPushBtn">⬆️ 推送到云端</button>
-                <span class="kv-status" id="kvStatus"></span>
-            </div>
-        </div>
-
         <!-- 筛选栏 -->
         <div class="filter-section" id="filterSection">
             <button class="filter-btn active" data-filter="__all__">全部</button>
@@ -595,16 +569,11 @@
     <script>
         (function() {
             const STORAGE_KEY = 'poe_my_affixes_v2';
-            const KV_CONFIG_KEY = 'poe_my_kv_config_v2';
-            const GIST_FILE = 'poe-affix-data.enc.json';
-            // 部署模式检测：无 file: 协议且同源有 /api/gist 时走服务端代理（Token 存在 Pages 环境变量）
-            const IS_ONLINE = location.protocol !== 'file:' &&
-                (location.hostname.endsWith('.pages.dev') || localStorage.getItem('poe_use_proxy') === '1');
 
             let affixes = [];
             let currentFilter = '__all__';
             let editingId = null;
-            let kvConfig = { token: '', gistId: '', passphrase: '' };
+            let syncing = false;
 
             const grid = document.getElementById('affixGrid');
             const toast = document.getElementById('toast');
@@ -623,17 +592,8 @@
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
-
-            // KV DOM
-            const kvPanel = document.getElementById('kvPanel');
-            const kvPanelBtn = document.getElementById('kvPanelBtn');
-            const kvGistId = document.getElementById('kvGistId');
-            const kvToken = document.getElementById('kvToken');
-            const kvPassphrase = document.getElementById('kvPassphrase');
-            const kvStatus = document.getElementById('kvStatus');
-            const kvSaveBtn = document.getElementById('kvSaveBtn');
-            const kvPullBtn = document.getElementById('kvPullBtn');
-            const kvPushBtn = document.getElementById('kvPushBtn');
+            const pushCloudBtn = document.getElementById('pushCloudBtn');
+            const pullCloudBtn = document.getElementById('pullCloudBtn');
 
             function generateId() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -656,32 +616,12 @@
                 saveToStorage();
             }
 
-            function loadKvConfig() {
-                try {
-                    const rawKv = localStorage.getItem(KV_CONFIG_KEY);
-                    if (rawKv) {
-                        const parsed = JSON.parse(rawKv);
-                        if (parsed && typeof parsed.token === 'string') {
-                            kvConfig = Object.assign({ token: '', gistId: '', passphrase: '' }, parsed);
-                        }
-                    }
-                } catch (e) { console.warn('读取 Gist 配置失败', e); }
-            }
-
             function saveToStorage() {
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(affixes));
                 } catch (e) {
                     console.error('保存本地数据失败', e);
                     alert('保存失败，可能是浏览器存储空间不足或被禁用。');
-                }
-            }
-
-            function saveKvConfig() {
-                try {
-                    localStorage.setItem(KV_CONFIG_KEY, JSON.stringify(kvConfig));
-                } catch (e) {
-                    console.error('保存 KV 配置失败', e);
                 }
             }
 
@@ -817,188 +757,76 @@
                 return item;
             }
 
-            // ---------- Gist 云同步（AES-GCM 加密） ----------
-            // 密码派生密钥：PBKDF2-SHA256，10万次迭代
-            async function deriveKey(passphrase, salt) {
-                const enc = new TextEncoder();
-                const keyMaterial = await crypto.subtle.importKey(
-                    'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
-                );
-                return crypto.subtle.deriveKey(
-                    { name: 'PBKDF2', hash: 'SHA-256', salt, iterations: 100000 },
-                    keyMaterial,
-                    { name: 'AES-GCM', length: 256 },
-                    false, ['encrypt', 'decrypt']
-                );
-            }
-
-            function b64encode(buf) {
-                const bytes = new Uint8Array(buf);
-                let s = '';
-                for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
-                return btoa(s);
-            }
-
-            function b64decode(str) {
-                const raw = atob(str);
-                const bytes = new Uint8Array(raw.length);
-                for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-                return bytes;
-            }
-
-            // 加密词缀数据：返回 { v: 1, salt, iv, data } 的 JSON 字符串
-            async function encryptAffixes(passphrase, affixArr) {
-                const salt = crypto.getRandomValues(new Uint8Array(16));
-                const iv = crypto.getRandomValues(new Uint8Array(12));
-                const key = await deriveKey(passphrase, salt);
-                const plain = new TextEncoder().encode(JSON.stringify({ affixes: affixArr, updated_at: new Date().toISOString() }));
-                const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
-                return JSON.stringify({
-                    v: 1,
-                    salt: b64encode(salt),
-                    iv: b64encode(iv),
-                    data: b64encode(cipher)
-                });
-            }
-
-            // 兼容旧的加密密码字段名
-            encryptAffixes.passphraseLabel = '同步密钥';
-
-            // 解密：密码错误抛异常
-            async function decryptAffixes(passphrase, encJson) {
-                const obj = JSON.parse(encJson);
-                if (obj.v !== 1) throw new Error('未知的数据版本');
-                const key = await deriveKey(passphrase, b64decode(obj.salt));
-                const plain = await crypto.subtle.decrypt(
-                    { name: 'AES-GCM', iv: b64decode(obj.iv) }, key, b64decode(obj.data)
-                );
-                const decoded = JSON.parse(new TextDecoder().decode(plain));
-                if (!Array.isArray(decoded.affixes)) throw new Error('数据格式不正确');
-                return decoded;
-            }
-
-            // Gist API 请求（线上版自动走同源 /api/gist 代理，Token 无需填写；本地 file: 直连 GitHub）
-            async function gistFetch(path, method, body) {
-                const base = IS_ONLINE && !kvConfig.token
-                    ? location.origin + '/api/gist'
-                    : 'https://api.github.com';
-                const headers = { 'Accept': 'application/vnd.github+json' };
-                if (!(IS_ONLINE && !kvConfig.token)) headers['Authorization'] = 'Bearer ' + (kvConfig.token || '');
-                if (kvConfig.passphrase) headers['X-Sync-Key'] = kvConfig.passphrase;
-                const opts = { method, headers };
+            // ---------- 云同步（服务端 /api/gist/data，无需任何配置） ----------
+            async function cloudFetch(method, body) {
+                const opts = { method, headers: {} };
                 if (body !== undefined) {
-                    headers['Content-Type'] = 'application/json';
+                    opts.headers['Content-Type'] = 'application/json';
                     opts.body = JSON.stringify(body);
                 }
-                const resp = await fetch(base + path, opts);
+                const resp = await fetch('/api/gist/data', opts);
+                const text = await resp.text();
+                let data = null;
+                try { data = text ? JSON.parse(text) : null; } catch (e) {}
                 if (!resp.ok) {
-                    let msg = 'HTTP ' + resp.status;
-                    try {
-                        const j = await resp.json();
-                        if (j && j.message) msg = j.message;
-                    } catch (e) {}
-                    if (resp.status === 401) msg = 'Token 无效或无 gist 权限';
-                    if (resp.status === 404) msg = 'Gist 不存在（ID 填错或无权访问）';
+                    const msg = (data && data.message) ? data.message : ('HTTP ' + resp.status);
                     throw new Error(msg);
                 }
-                return resp.json();
+                return data;
             }
 
-            function renderKvStatus() {
-                if (kvConfig.gistId) {
-                    kvStatus.textContent = '已绑定 Gist：' + kvConfig.gistId.slice(0, 8) + '…' + (kvConfig.passphrase ? '（已设密钥）' : '');
-                    kvStatus.className = 'kv-status ok';
-                } else {
-                    kvStatus.textContent = IS_ONLINE && !kvConfig.token
-                        ? '在线模式：服务端托管 Token，首次推送自动建 Gist'
-                        : '未绑定 Gist（首次推送会自动创建）';
-                    kvStatus.className = 'kv-status';
+            async function pushCloud() {
+                if (syncing) return;
+                if (location.protocol === 'file:') {
+                    alert('本地文件模式不支持云同步，请使用线上版：\nhttps://poe-affix.pages.dev');
+                    return;
                 }
-            }
-
-            async function pullFromKv() {
-                if (!kvConfig.gistId) { alert('请先填写 Gist ID（或先推送一次自动创建）'); return; }
-                if (!kvConfig.passphrase) { alert('请先填写同步密钥'); return; }
+                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端（覆盖云端旧数据），继续？`)) return;
+                syncing = true;
+                const oldText = pushCloudBtn.textContent;
+                pushCloudBtn.textContent = '⏳ 推送中…';
+                pushCloudBtn.disabled = true;
                 try {
-                    kvStatus.textContent = '拉取中…';
-                    kvStatus.className = 'kv-status';
-                    const gist = await gistFetch('/gists/' + kvConfig.gistId, 'GET');
-                    const file = gist.files && gist.files[GIST_FILE];
-                    if (!file) throw new Error('Gist 中没有数据文件（可能用错了 Gist）');
-                    const rawResp = await fetch(file.raw_url);
-                    if (!rawResp.ok) throw new Error('下载密文失败：HTTP ' + rawResp.status);
-                    const raw = await rawResp.text();
-                    const decoded = await decryptAffixes(kvConfig.passphrase, raw);
-                    affixes = decoded.affixes;
-                    saveToStorage();
-                    render();
-                    kvStatus.textContent = '已拉取 ' + affixes.length + ' 条词缀' + (decoded.updated_at ? '（' + decoded.updated_at.slice(0, 19).replace('T', ' ') + '）' : '');
-                    kvStatus.className = 'kv-status ok';
-                    showToast('云端拉取成功', '☁️');
+                    const res = await cloudFetch('POST', { affixes: affixes });
+                    showToast('已推送 ' + (res.count != null ? res.count : affixes.length) + ' 条到云端', '☁️');
                 } catch (err) {
-                    kvStatus.textContent = '拉取失败：' + err.message;
-                    kvStatus.className = 'kv-status err';
-                    alert('拉取失败：' + err.message + (err.message.includes('format') || err.message.includes('operation') ? '（密码可能不正确）' : ''));
-                }
-            }
-
-            async function pushToKv() {
-                if (!kvConfig.token && !(IS_ONLINE)) { alert('本地文件模式请先填写 GitHub Token，或改用线上版'); return; }
-                if (!kvConfig.passphrase) { alert('请先填写同步密钥'); return; }
-                try {
-                    kvStatus.textContent = '加密推送中…';
-                    kvStatus.className = 'kv-status';
-                    const content = await encryptAffixes(kvConfig.passphrase, affixes);
-                    let gistId = kvConfig.gistId;
-                    if (gistId) {
-                        // 已有 Gist：更新文件
-                        await gistFetch('/gists/' + gistId, 'PATCH', {
-                            files: { [GIST_FILE]: { content } }
-                        });
-                    } else {
-                        // 首次：创建 secret Gist
-                        const created = await gistFetch('/gists', 'POST', {
-                            description: 'POE 词缀库云端备份（AES 加密）',
-                            public: false,
-                            files: { [GIST_FILE]: { content } }
-                        });
-                        gistId = created.id;
-                        kvConfig.gistId = gistId;
-                        saveKvConfig();
-                        kvGistId.value = gistId;
-                    }
-                    kvStatus.textContent = '推送成功（' + affixes.length + ' 条已加密）';
-                    kvStatus.className = 'kv-status ok';
-                    renderKvStatus();
-                    showToast('已加密推送到 Gist', '☁️');
-                } catch (err) {
-                    kvStatus.textContent = '推送失败：' + err.message;
-                    kvStatus.className = 'kv-status err';
                     alert('推送失败：' + err.message);
+                } finally {
+                    syncing = false;
+                    pushCloudBtn.textContent = oldText;
+                    pushCloudBtn.disabled = false;
                 }
             }
 
-            function openKvPanel() {
-                kvToken.value = kvConfig.token;
-                kvGistId.value = kvConfig.gistId;
-                kvPassphrase.value = kvConfig.passphrase;
-                kvPanel.classList.add('show');
-                kvPanelBtn.textContent = '☁️ 关闭云同步';
-                renderKvStatus();
-            }
-
-            function closeKvPanel() {
-                kvPanel.classList.remove('show');
-                kvPanelBtn.textContent = '☁️ Gist 云同步';
-            }
-
-            function saveKvSettings() {
-                kvConfig.token = kvToken.value.trim();
-                kvConfig.gistId = kvGistId.value.trim();
-                kvConfig.passphrase = kvPassphrase.value;
-                saveKvConfig();
-                renderKvStatus();
-                showToast('同步配置已保存', '☁️');
+            async function pullCloud() {
+                if (syncing) return;
+                if (location.protocol === 'file:') {
+                    alert('本地文件模式不支持云同步，请使用线上版：\nhttps://poe-affix.pages.dev');
+                    return;
+                }
+                syncing = true;
+                const oldText = pullCloudBtn.textContent;
+                pullCloudBtn.textContent = '⏳ 拉取中…';
+                pullCloudBtn.disabled = true;
+                try {
+                    const res = await cloudFetch('GET');
+                    const remote = (res && res.affixes != null) ? res.affixes : [];
+                    const when = res && res.updated_at ? res.updated_at.slice(0, 19).replace('T', ' ') : '';
+                    if (remote.length === 0) {
+                        alert('云端没有数据');
+                    } else {
+                        affixes = remote;
+                        saveToStorage();
+                        render();
+                        showToast('已拉取 ' + remote.length + ' 条词缀' + (when ? '（' + when + '）' : ''), '⬇️');
+                    }
+                } catch (err) {
+                    alert('拉取失败：' + err.message);
+                } finally {
+                    syncing = false;
+                    pullCloudBtn.textContent = oldText;
+                    pullCloudBtn.disabled = false;
+                }
             }
 
             // ---------- 渲染 ----------
@@ -1257,17 +1085,9 @@
                     }
                 });
 
-                // KV 面板
-                kvPanelBtn.addEventListener('click', () => {
-                    if (kvPanel.classList.contains('show')) {
-                        closeKvPanel();
-                    } else {
-                        openKvPanel();
-                    }
-                });
-                kvSaveBtn.addEventListener('click', saveKvSettings);
-                kvPullBtn.addEventListener('click', pullFromKv);
-                kvPushBtn.addEventListener('click', pushToKv);
+                // 云同步
+                pushCloudBtn.addEventListener('click', pushCloud);
+                pullCloudBtn.addEventListener('click', pullCloud);
 
                 exportBtn.addEventListener('click', exportData);
                 importBtn.addEventListener('click', importData);
@@ -1283,7 +1103,6 @@
 
             function init() {
                 loadFromStorage();
-                loadKvConfig();
                 bindEvents();
                 render();
             }
