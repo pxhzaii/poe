@@ -78,10 +78,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          mkdir -p public
-          cp index.html public/index.html
-          # functions 目录与 public 平级，wrangler pages deploy 会自动识别打包
-          npx wrangler pages deploy public --project-name poe-affix
+          # 仓库根有 index.html 和 functions/ 目录
+          # wrangler pages deploy 会自动扫描与 deploy-dir 平级的 functions/ 目录
+          # 仓库结构：index.html + functions/api/gist.js，所以直接用仓库根作为 deploy-dir
+          npx wrangler pages deploy . --project-name poe-affix --commit-dirty=true
 
       - name: Verify deployment
         run: |
