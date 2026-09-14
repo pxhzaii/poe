@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>流放之路 · 我的词缀库</title>
+    <title>娴佹斁涔嬭矾 路 鎴戠殑璇嶇紑搴?/title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,7 @@
             width: 100%;
         }
 
-        /* 头部 */
+        /* 澶撮儴 */
         .header {
             display: flex;
             align-items: center;
@@ -53,7 +53,7 @@
             flex-wrap: wrap;
         }
 
-        /* 通用按钮 */
+        /* 閫氱敤鎸夐挳 */
         .btn {
             background: #1e2530;
             border: 1px solid #2e3848;
@@ -100,7 +100,7 @@
             color: #ffc8d0;
         }
 
-        /* 添加表单 */
+        /* 娣诲姞琛ㄥ崟 */
         .add-form {
             background: #10161f;
             border: 1px solid #232b37;
@@ -171,7 +171,7 @@
             margin-top: 0.9rem;
         }
 
-        /* 筛选栏 */
+        /* 绛涢€夋爮 */
         .filter-section {
             display: flex;
             flex-wrap: wrap;
@@ -206,7 +206,7 @@
             box-shadow: 0 0 10px rgba(201, 181, 120, 0.2);
         }
 
-        /* 统计 */
+        /* 缁熻 */
         .stats-bar {
             font-size: 0.85rem;
             color: #6b7a92;
@@ -217,14 +217,14 @@
             gap: 0.5rem;
         }
 
-        /* 词缀网格 */
+        /* 璇嶇紑缃戞牸 */
         .affix-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
             gap: 1rem;
         }
 
-        /* 卡片 */
+        /* 鍗＄墖 */
         .affix-card {
             background: #10161f;
             border: 1px solid #232b37;
@@ -264,7 +264,7 @@
             white-space: nowrap;
         }
 
-        /* 卡片操作按钮 */
+        /* 鍗＄墖鎿嶄綔鎸夐挳 */
         .card-actions {
             display: flex;
             gap: 0.3rem;
@@ -298,7 +298,7 @@
             color: #ff9aa8;
         }
 
-        /* ========== 名称 + 数值 并列容器 ========== */
+        /* ========== 鍚嶇О + 鏁板€?骞跺垪瀹瑰櫒 ========== */
         .affix-content {
             display: flex;
             flex-direction: column;
@@ -306,7 +306,7 @@
             margin-top: 0.2rem;
         }
 
-        /* 通用复制项样式（名称与数值完全一致） */
+        /* 閫氱敤澶嶅埗椤规牱寮忥紙鍚嶇О涓庢暟鍊煎畬鍏ㄤ竴鑷达級 */
         .copy-item {
             display: flex;
             align-items: center;
@@ -332,7 +332,7 @@
             background: #283545;
         }
 
-        /* 内容文字 */
+        /* 鍐呭鏂囧瓧 */
         .copy-item-text {
             flex: 1;
             font-size: 1rem;
@@ -343,7 +343,7 @@
             line-height: 1.4;
         }
 
-        /* 复制小图标 */
+        /* 澶嶅埗灏忓浘鏍?*/
         .copy-item-icon {
             font-size: 0.9rem;
             opacity: 0.4;
@@ -356,7 +356,7 @@
             color: #c9b578;
         }
 
-        /* 名称特殊一点：让它不至于完全一样，但同样大小 */
+        /* 鍚嶇О鐗规畩涓€鐐癸細璁╁畠涓嶈嚦浜庡畬鍏ㄤ竴鏍凤紝浣嗗悓鏍峰ぇ灏?*/
         .copy-item.name .copy-item-text {
             color: #f0e6d2;
             font-weight: 450;
@@ -368,7 +368,7 @@
             color: #f0e6d2;
         }
 
-        /* 空状态 */
+        /* 绌虹姸鎬?*/
         .empty-state {
             grid-column: 1 / -1;
             text-align: center;
@@ -381,7 +381,7 @@
             line-height: 1.8;
         }
 
-        /* 复制反馈 */
+        /* 澶嶅埗鍙嶉 */
         .toast {
             position: fixed;
             top: 30px;
@@ -410,7 +410,7 @@
             transform: translateX(-50%) scale(1);
         }
 
-        /* 底部 */
+        /* 搴曢儴 */
         .footer-note {
             margin-top: 2.5rem;
             color: #4b5a70;
@@ -421,7 +421,13 @@
             line-height: 1.8;
         }
 
-        /* KV 面板 */
+        /* 鍚屾瀵嗙爜杈撳叆妗?*/
+        .sync-key-input:focus {
+            border-color: #a58e4a;
+            box-shadow: 0 0 8px rgba(201, 181, 120, 0.2);
+        }
+
+        /* KV 闈㈡澘 */
         .kv-panel {
             background: #10161f;
             border: 1px solid #232b37;
@@ -506,65 +512,66 @@
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
+        <!-- 澶撮儴 -->
         <div class="header">
-            <h1>⚔️ 流放之路 · 我的词缀库</h1>
+            <h1>鈿旓笍 娴佹斁涔嬭矾 路 鎴戠殑璇嶇紑搴?/h1>
             <div class="header-actions">
-                <button class="btn btn-primary" id="toggleAddForm">➕ 添加词缀</button>
-                <button class="btn" id="pushCloudBtn" title="把当前词缀推送到云端备份">☁️ 推送云端</button>
-                <button class="btn" id="pullCloudBtn" title="用云端数据覆盖本地">⬇️ 拉取云端</button>
-                <button class="btn" id="exportBtn">📤 导出</button>
-                <button class="btn" id="importBtn">📥 导入</button>
-                <button class="btn btn-danger" id="clearAllBtn">🗑️ 清空</button>
+                <button class="btn btn-primary" id="toggleAddForm">鉃?娣诲姞璇嶇紑</button>
+                <input type="password" id="syncKeyInput" class="sync-key-input" placeholder="鍚屾瀵嗙爜" autocomplete="off" style="width:90px;height:36px;border-radius:30px;border:1px solid #2b3546;background:#181f2b;color:#e3e6ed;padding:0 0.8rem;font-size:0.82rem;outline:none;">
+                <button class="btn" id="pushCloudBtn" title="鎶婂綋鍓嶈瘝缂€鎺ㄩ€佸埌浜戠澶囦唤">鈽侊笍 鎺ㄩ€佷簯绔?/button>
+                <button class="btn" id="pullCloudBtn" title="鐢ㄤ簯绔暟鎹鐩栨湰鍦?>猬囷笍 鎷夊彇浜戠</button>
+                <button class="btn" id="exportBtn">馃摛 瀵煎嚭</button>
+                <button class="btn" id="importBtn">馃摜 瀵煎叆</button>
+                <button class="btn btn-danger" id="clearAllBtn">馃棏锔?娓呯┖</button>
             </div>
         </div>
 
-        <!-- 添加/编辑表单 -->
+        <!-- 娣诲姞/缂栬緫琛ㄥ崟 -->
         <div class="add-form" id="addForm">
-            <div class="form-title" id="formTitle">✨ 添加新词缀</div>
+            <div class="form-title" id="formTitle">鉁?娣诲姞鏂拌瘝缂€</div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>分类</label>
-                    <input type="text" id="inputCategory" list="categoryList" placeholder="例如：负电甲/召唤衣 或 法血/戒指" autocomplete="off">
+                    <label>鍒嗙被</label>
+                    <input type="text" id="inputCategory" list="categoryList" placeholder="渚嬪锛氳礋鐢电敳/鍙敜琛?鎴?娉曡/鎴掓寚" autocomplete="off">
                     <datalist id="categoryList"></datalist>
                 </div>
                 <div class="form-group" style="flex: 2 0 200px;">
-                    <label>词缀名称</label>
-                    <input type="text" id="inputName" placeholder="例如：增加最大生命" autocomplete="off">
+                    <label>璇嶇紑鍚嶇О</label>
+                    <input type="text" id="inputName" placeholder="渚嬪锛氬鍔犳渶澶х敓鍛? autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label>数值 / 内容</label>
-                    <input type="text" id="inputValue" placeholder="例如：22222" autocomplete="off">
+                    <label>鏁板€?/ 鍐呭</label>
+                    <input type="text" id="inputValue" placeholder="渚嬪锛?2222" autocomplete="off">
                 </div>
             </div>
             <div class="form-actions">
-                <button class="btn btn-primary" id="saveAffixBtn">💾 保存</button>
-                <button class="btn" id="cancelFormBtn">取消</button>
+                <button class="btn btn-primary" id="saveAffixBtn">馃捑 淇濆瓨</button>
+                <button class="btn" id="cancelFormBtn">鍙栨秷</button>
             </div>
         </div>
 
-        <!-- 筛选栏 -->
+        <!-- 绛涢€夋爮 -->
         <div class="filter-section" id="filterSection">
-            <button class="filter-btn active" data-filter="__all__">全部</button>
+            <button class="filter-btn active" data-filter="__all__">鍏ㄩ儴</button>
         </div>
 
-        <!-- 统计 -->
+        <!-- 缁熻 -->
         <div class="stats-bar">
-            <span id="affixCount">共 0 条词缀</span>
-            <span style="font-size:0.78rem; color:#5b6a80;">数据保存在本地浏览器 · 点击名称或数值均可复制</span>
+            <span id="affixCount">鍏?0 鏉¤瘝缂€</span>
+            <span style="font-size:0.78rem; color:#5b6a80;">鏁版嵁淇濆瓨鍦ㄦ湰鍦版祻瑙堝櫒 路 鐐瑰嚮鍚嶇О鎴栨暟鍊煎潎鍙鍒?/span>
         </div>
 
-        <!-- 词缀网格 -->
+        <!-- 璇嶇紑缃戞牸 -->
         <div class="affix-grid" id="affixGrid"></div>
 
-        <!-- 底部 -->
+        <!-- 搴曢儴 -->
         <div class="footer-note">
-            <span>名称与数值并列 · 点击任意一个都能复制 · 分类可自定义 · 可绑定 Gist 云端同步（AES 加密） · 建议定期导出备份</span>
+            <span>鍚嶇О涓庢暟鍊煎苟鍒?路 鐐瑰嚮浠绘剰涓€涓兘鑳藉鍒?路 鍒嗙被鍙嚜瀹氫箟 路 浜戠鍚屾闇€杈撳叆瀵嗙爜 路 寤鸿瀹氭湡瀵煎嚭澶囦唤</span>
         </div>
     </div>
 
-    <!-- 复制反馈 -->
-    <div class="toast" id="toast">📋 已复制: <span id="toastValue"></span></div>
+    <!-- 澶嶅埗鍙嶉 -->
+    <div class="toast" id="toast">馃搵 宸插鍒? <span id="toastValue"></span></div>
 
     <script>
         (function() {
@@ -594,6 +601,7 @@
             const clearAllBtn = document.getElementById('clearAllBtn');
             const pushCloudBtn = document.getElementById('pushCloudBtn');
             const pullCloudBtn = document.getElementById('pullCloudBtn');
+            const syncKeyInput = document.getElementById('syncKeyInput');
 
             function generateId() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -610,7 +618,7 @@
                         }
                     }
                 } catch (e) {
-                    console.warn('读取本地数据失败', e);
+                    console.warn('璇诲彇鏈湴鏁版嵁澶辫触', e);
                 }
                 affixes = [];
                 saveToStorage();
@@ -620,8 +628,8 @@
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(affixes));
                 } catch (e) {
-                    console.error('保存本地数据失败', e);
-                    alert('保存失败，可能是浏览器存储空间不足或被禁用。');
+                    console.error('淇濆瓨鏈湴鏁版嵁澶辫触', e);
+                    alert('淇濆瓨澶辫触锛屽彲鑳芥槸娴忚鍣ㄥ瓨鍌ㄧ┖闂翠笉瓒虫垨琚鐢ㄣ€?);
                 }
             }
 
@@ -631,7 +639,7 @@
                         await navigator.clipboard.writeText(text);
                         return true;
                     } catch (err) {
-                        console.warn('clipboard API 失败，尝试降级', err);
+                        console.warn('clipboard API 澶辫触锛屽皾璇曢檷绾?, err);
                     }
                 }
                 try {
@@ -647,13 +655,13 @@
                     document.body.removeChild(textarea);
                     return success;
                 } catch (err) {
-                    console.error('复制失败', err);
+                    console.error('澶嶅埗澶辫触', err);
                     return false;
                 }
             }
 
             let toastTimer = null;
-            function showToast(message, prefix = '📋 已复制') {
+            function showToast(message, prefix = '馃搵 宸插鍒?) {
                 toastValueSpan.textContent = message;
                 toast.childNodes[0].textContent = prefix + ': ';
                 toast.classList.add('show');
@@ -730,7 +738,7 @@
             function createCopyItem(text, type) {
                 const item = document.createElement('div');
                 item.className = `copy-item ${type}`;
-                item.title = `点击复制${type === 'name' ? '名称' : '数值'}`;
+                item.title = `鐐瑰嚮澶嶅埗${type === 'name' ? '鍚嶇О' : '鏁板€?}`;
 
                 const textEl = document.createElement('span');
                 textEl.className = 'copy-item-text';
@@ -738,7 +746,7 @@
 
                 const iconEl = document.createElement('span');
                 iconEl.className = 'copy-item-icon';
-                iconEl.textContent = '📋';
+                iconEl.textContent = '馃搵';
 
                 item.appendChild(textEl);
                 item.appendChild(iconEl);
@@ -749,7 +757,7 @@
                     if (ok) {
                         showToast(
                             text,
-                            type === 'name' ? '📋 已复制名称' : '📋 已复制数值'
+                            type === 'name' ? '馃搵 宸插鍒跺悕绉? : '馃搵 宸插鍒舵暟鍊?
                         );
                     }
                 });
@@ -757,9 +765,14 @@
                 return item;
             }
 
-            // ---------- 云同步（服务端 /api/gist/data，无需任何配置） ----------
+            // ---------- 浜戝悓姝ワ紙鏈嶅姟绔?/api/gist/data锛屾棤闇€浠讳綍閰嶇疆锛?----------
+            function getSyncKey() {
+                return (syncKeyInput.value || '').trim();
+            }
+
             async function cloudFetch(method, body) {
                 const opts = { method, headers: {} };
+                opts.headers['X-Sync-Key'] = getSyncKey();
                 if (body !== undefined) {
                     opts.headers['Content-Type'] = 'application/json';
                     opts.body = JSON.stringify(body);
@@ -778,19 +791,24 @@
             async function pushCloud() {
                 if (syncing) return;
                 if (location.protocol === 'file:') {
-                    alert('本地文件模式不支持云同步，请使用线上版：\nhttps://poe-affix.pages.dev');
+                    alert('鏈湴鏂囦欢妯″紡涓嶆敮鎸佷簯鍚屾锛岃浣跨敤绾夸笂鐗堬細\nhttps://poe-affix.pages.dev');
                     return;
                 }
-                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端（覆盖云端旧数据），继续？`)) return;
+                if (!getSyncKey()) {
+                    alert('璇峰厛杈撳叆鍚屾瀵嗙爜');
+                    syncKeyInput.focus();
+                    return;
+                }
+                if (!confirm(`灏嗗綋鍓?${affixes.length} 鏉¤瘝缂€鎺ㄩ€佸埌浜戠锛堣鐩栦簯绔棫鏁版嵁锛夛紝缁х画锛焋)) return;
                 syncing = true;
                 const oldText = pushCloudBtn.textContent;
-                pushCloudBtn.textContent = '⏳ 推送中…';
+                pushCloudBtn.textContent = '鈴?鎺ㄩ€佷腑鈥?;
                 pushCloudBtn.disabled = true;
                 try {
                     const res = await cloudFetch('POST', { affixes: affixes });
-                    showToast('已推送 ' + (res.count != null ? res.count : affixes.length) + ' 条到云端', '☁️');
+                    showToast('宸叉帹閫?' + (res.count != null ? res.count : affixes.length) + ' 鏉″埌浜戠', '鈽侊笍');
                 } catch (err) {
-                    alert('推送失败：' + err.message);
+                    alert('鎺ㄩ€佸け璐ワ細' + err.message);
                 } finally {
                     syncing = false;
                     pushCloudBtn.textContent = oldText;
@@ -801,27 +819,32 @@
             async function pullCloud() {
                 if (syncing) return;
                 if (location.protocol === 'file:') {
-                    alert('本地文件模式不支持云同步，请使用线上版：\nhttps://poe-affix.pages.dev');
+                    alert('鏈湴鏂囦欢妯″紡涓嶆敮鎸佷簯鍚屾锛岃浣跨敤绾夸笂鐗堬細\nhttps://poe-affix.pages.dev');
+                    return;
+                }
+                if (!getSyncKey()) {
+                    alert('璇峰厛杈撳叆鍚屾瀵嗙爜');
+                    syncKeyInput.focus();
                     return;
                 }
                 syncing = true;
                 const oldText = pullCloudBtn.textContent;
-                pullCloudBtn.textContent = '⏳ 拉取中…';
+                pullCloudBtn.textContent = '鈴?鎷夊彇涓€?;
                 pullCloudBtn.disabled = true;
                 try {
                     const res = await cloudFetch('GET');
                     const remote = (res && res.affixes != null) ? res.affixes : [];
                     const when = res && res.updated_at ? res.updated_at.slice(0, 19).replace('T', ' ') : '';
                     if (remote.length === 0) {
-                        alert('云端没有数据');
+                        alert('浜戠娌℃湁鏁版嵁');
                     } else {
                         affixes = remote;
                         saveToStorage();
                         render();
-                        showToast('已拉取 ' + remote.length + ' 条词缀' + (when ? '（' + when + '）' : ''), '⬇️');
+                        showToast('宸叉媺鍙?' + remote.length + ' 鏉¤瘝缂€' + (when ? '锛? + when + '锛? : ''), '猬囷笍');
                     }
                 } catch (err) {
-                    alert('拉取失败：' + err.message);
+                    alert('鎷夊彇澶辫触锛? + err.message);
                 } finally {
                     syncing = false;
                     pullCloudBtn.textContent = oldText;
@@ -829,7 +852,7 @@
                 }
             }
 
-            // ---------- 渲染 ----------
+            // ---------- 娓叉煋 ----------
             function render() {
                 updateCategoryDatalist();
                 renderFilterButtons();
@@ -838,8 +861,8 @@
                     ? affixes
                     : affixes.filter(item => item.category === currentFilter);
 
-                affixCountSpan.textContent = `共 ${affixes.length} 条词缀` +
-                    (currentFilter !== '__all__' ? `（当前显示 ${filtered.length} 条）` : '');
+                affixCountSpan.textContent = `鍏?${affixes.length} 鏉¤瘝缂€` +
+                    (currentFilter !== '__all__' ? `锛堝綋鍓嶆樉绀?${filtered.length} 鏉★級` : '');
 
                 grid.innerHTML = '';
 
@@ -847,9 +870,9 @@
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'empty-state';
                     if (affixes.length === 0) {
-                        emptyDiv.innerHTML = '📭 还没有任何词缀<br><span style="font-size:0.85rem;color:#4f5d72;">点击右上角「添加词缀」开始创建，分类可自定义</span>';
+                        emptyDiv.innerHTML = '馃摥 杩樻病鏈変换浣曡瘝缂€<br><span style="font-size:0.85rem;color:#4f5d72;">鐐瑰嚮鍙充笂瑙掋€屾坊鍔犺瘝缂€銆嶅紑濮嬪垱寤猴紝鍒嗙被鍙嚜瀹氫箟</span>';
                     } else {
-                        emptyDiv.innerHTML = '🔍 该分类下没有词缀';
+                        emptyDiv.innerHTML = '馃攳 璇ュ垎绫讳笅娌℃湁璇嶇紑';
                     }
                     grid.appendChild(emptyDiv);
                     return;
@@ -860,22 +883,22 @@
                     card.className = 'affix-card';
                     card.dataset.id = item.id;
 
-                    // 头部：分类 + 操作按钮
+                    // 澶撮儴锛氬垎绫?+ 鎿嶄綔鎸夐挳
                     const cardHeader = document.createElement('div');
                     cardHeader.className = 'affix-card-header';
 
                     const catEl = document.createElement('span');
                     catEl.className = 'affix-category';
-                    catEl.textContent = item.category || '未分类';
-                    catEl.title = item.category || '未分类';
+                    catEl.textContent = item.category || '鏈垎绫?;
+                    catEl.title = item.category || '鏈垎绫?;
 
                     const actions = document.createElement('div');
                     actions.className = 'card-actions';
 
                     const editBtn = document.createElement('button');
                     editBtn.className = 'icon-btn edit';
-                    editBtn.title = '编辑';
-                    editBtn.innerHTML = '✏️';
+                    editBtn.title = '缂栬緫';
+                    editBtn.innerHTML = '鉁忥笍';
                     editBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         startEdit(item.id);
@@ -883,8 +906,8 @@
 
                     const delBtn = document.createElement('button');
                     delBtn.className = 'icon-btn delete';
-                    delBtn.title = '删除';
-                    delBtn.innerHTML = '🗑️';
+                    delBtn.title = '鍒犻櫎';
+                    delBtn.innerHTML = '馃棏锔?;
                     delBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         deleteAffix(item.id);
@@ -896,7 +919,7 @@
                     cardHeader.appendChild(catEl);
                     cardHeader.appendChild(actions);
 
-                    // ========== 名称 + 数值 并列 ==========
+                    // ========== 鍚嶇О + 鏁板€?骞跺垪 ==========
                     const contentWrap = document.createElement('div');
                     contentWrap.className = 'affix-content';
 
@@ -915,7 +938,7 @@
 
             function openAddForm() {
                 editingId = null;
-                formTitle.textContent = '✨ 添加新词缀';
+                formTitle.textContent = '鉁?娣诲姞鏂拌瘝缂€';
                 inputCategory.value = '';
                 inputName.value = '';
                 inputValue.value = '';
@@ -934,7 +957,7 @@
                 const item = affixes.find(a => a.id === id);
                 if (!item) return;
                 editingId = id;
-                formTitle.textContent = '✏️ 编辑词缀';
+                formTitle.textContent = '鉁忥笍 缂栬緫璇嶇紑';
                 inputCategory.value = item.category || '';
                 inputName.value = item.name;
                 inputValue.value = item.value;
@@ -949,17 +972,17 @@
                 const value = inputValue.value.trim();
 
                 if (!category) {
-                    alert('请输入分类（例如：负电甲/召唤衣、法血/戒指）');
+                    alert('璇疯緭鍏ュ垎绫伙紙渚嬪锛氳礋鐢电敳/鍙敜琛ｃ€佹硶琛€/鎴掓寚锛?);
                     inputCategory.focus();
                     return;
                 }
                 if (!name) {
-                    alert('请输入词缀名称');
+                    alert('璇疯緭鍏ヨ瘝缂€鍚嶇О');
                     inputName.focus();
                     return;
                 }
                 if (!value) {
-                    alert('请输入数值/内容');
+                    alert('璇疯緭鍏ユ暟鍊?鍐呭');
                     inputValue.focus();
                     return;
                 }
@@ -986,7 +1009,7 @@
             function deleteAffix(id) {
                 const item = affixes.find(a => a.id === id);
                 if (!item) return;
-                if (!confirm(`确定删除词缀「${item.name}」？`)) return;
+                if (!confirm(`纭畾鍒犻櫎璇嶇紑銆?{item.name}銆嶏紵`)) return;
                 affixes = affixes.filter(a => a.id !== id);
                 saveToStorage();
                 render();
@@ -995,11 +1018,11 @@
 
             function clearAll() {
                 if (affixes.length === 0) {
-                    alert('已经是空的了');
+                    alert('宸茬粡鏄┖鐨勪簡');
                     return;
                 }
-                if (!confirm(`确定要清空所有 ${affixes.length} 条词缀吗？此操作不可恢复！`)) return;
-                if (!confirm('再次确认：真的要全部删除吗？')) return;
+                if (!confirm(`纭畾瑕佹竻绌烘墍鏈?${affixes.length} 鏉¤瘝缂€鍚楋紵姝ゆ搷浣滀笉鍙仮澶嶏紒`)) return;
+                if (!confirm('鍐嶆纭锛氱湡鐨勮鍏ㄩ儴鍒犻櫎鍚楋紵')) return;
                 affixes = [];
                 saveToStorage();
                 render();
@@ -1016,7 +1039,7 @@
                 a.download = `poe-affixes-${date}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                showToast('已导出 JSON 文件', '📤');
+                showToast('宸插鍑?JSON 鏂囦欢', '馃摛');
             }
 
             function importData() {
@@ -1031,28 +1054,28 @@
                         try {
                             const imported = JSON.parse(ev.target.result);
                             if (!Array.isArray(imported)) {
-                                alert('文件格式不正确，应为词缀数组');
+                                alert('鏂囦欢鏍煎紡涓嶆纭紝搴斾负璇嶇紑鏁扮粍');
                                 return;
                             }
                             const valid = imported.filter(item =>
                                 item && typeof item.name === 'string' && typeof item.value === 'string'
                             ).map(item => ({
                                 id: item.id || generateId(),
-                                category: (item.category && typeof item.category === 'string') ? item.category.trim() : '未分类',
+                                category: (item.category && typeof item.category === 'string') ? item.category.trim() : '鏈垎绫?,
                                 name: item.name,
                                 value: item.value
                             }));
                             if (valid.length === 0) {
-                                alert('没有找到有效的词缀数据');
+                                alert('娌℃湁鎵惧埌鏈夋晥鐨勮瘝缂€鏁版嵁');
                                 return;
                             }
-                            if (!confirm(`即将导入 ${valid.length} 条词缀。\n当前已有 ${affixes.length} 条，导入后总数将为 ${affixes.length + valid.length} 条。是否继续？`)) return;
+                            if (!confirm(`鍗冲皢瀵煎叆 ${valid.length} 鏉¤瘝缂€銆俓n褰撳墠宸叉湁 ${affixes.length} 鏉★紝瀵煎叆鍚庢€绘暟灏嗕负 ${affixes.length + valid.length} 鏉°€傛槸鍚︾户缁紵`)) return;
                             affixes = affixes.concat(valid);
                             saveToStorage();
                             render();
-                            showToast(`成功导入 ${valid.length} 条`, '📥');
+                            showToast(`鎴愬姛瀵煎叆 ${valid.length} 鏉, '馃摜');
                         } catch (err) {
-                            alert('解析文件失败：' + err.message);
+                            alert('瑙ｆ瀽鏂囦欢澶辫触锛? + err.message);
                         }
                     };
                     reader.readAsText(file);
@@ -1085,8 +1108,7 @@
                     }
                 });
 
-                // 云同步
-                pushCloudBtn.addEventListener('click', pushCloud);
+                // 浜戝悓姝?                pushCloudBtn.addEventListener('click', pushCloud);
                 pullCloudBtn.addEventListener('click', pullCloud);
 
                 exportBtn.addEventListener('click', exportData);
@@ -1103,6 +1125,17 @@
 
             function init() {
                 loadFromStorage();
+                // 鍥炲～鍚屾瀵嗙爜
+                try {
+                    const savedKey = localStorage.getItem('poe_sync_key');
+                    if (savedKey) syncKeyInput.value = savedKey;
+                } catch (e) {}
+                syncKeyInput.addEventListener('change', function() {
+                    try { localStorage.setItem('poe_sync_key', getSyncKey()); } catch (e) {}
+                });
+                syncKeyInput.addEventListener('blur', function() {
+                    try { localStorage.setItem('poe_sync_key', getSyncKey()); } catch (e) {}
+                });
                 bindEvents();
                 render();
             }
