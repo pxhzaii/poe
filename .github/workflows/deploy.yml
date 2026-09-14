@@ -30,9 +30,9 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/poe-affix" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" || true)
           if [ "$CODE" = "200" ]; then
-            echo "Pages 椤圭洰 poe-affix 宸插瓨鍦?
+            echo "Pages project poe-affix already exists"
           else
-            echo "鍒涘缓 Pages 椤圭洰 poe-affix..."
+            echo "Creating Pages project poe-affix..."
             curl -sS -m 30 -X POST \
               "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
@@ -40,9 +40,9 @@ jobs:
               -d '{"name":"poe-affix","production_branch":"main"}' | node -e '
               let i="";process.stdin.on("data",c=>i+=c);process.stdin.on("end",()=>{
                 try{const j=JSON.parse(i);
-                  if(!j.success){console.log("鍒涘缓澶辫触: "+JSON.stringify(j.errors));process.exit(1);}
-                  else{console.log("鍒涘缓鎴愬姛: "+j.result.name);}
-                }catch(e){console.log("鍝嶅簲寮傚父:"+i.slice(0,300));process.exit(1);}
+                  if(!j.success){console.log("Create failed: "+JSON.stringify(j.errors));process.exit(1);}
+                  else{console.log("Created: "+j.result.name);}
+                }catch(e){console.log("Parse error:"+i.slice(0,300));process.exit(1);}
               })'
           fi
 
@@ -72,17 +72,17 @@ jobs:
         env:
           SYNC_KEY: ${{ secrets.SYNC_KEY }}
         run: |
-          echo "=== 绛夊緟閮ㄧ讲鐢熸晥 ==="
+          echo "=== Waiting for deployment to take effect ==="
           sleep 30
-          echo "--- Pages 棣栭〉 ---"
+          echo "--- Pages homepage ---"
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev" || true
-          echo "--- /api/gist/data GET 鏃犲瘑鐮侊紙搴旇繑鍥?401锛?---"
+          echo "--- GET /api/gist/data without key (expect 401) ---"
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev/api/gist/data" || true
-          echo "--- /api/gist/data GET 甯﹀瘑鐮侊紙搴旇繑鍥?JSON锛?---"
+          echo "--- GET /api/gist/data with key (expect JSON) ---"
           curl -sS -m 30 "https://poe-affix.pages.dev/api/gist/data" \
             -H "X-Sync-Key: $SYNC_KEY" | head -c 200 || true
           echo ""
-          echo "--- /api/gist/data POST 甯﹀瘑鐮侊紙鍐欑┖鏁扮粍娴嬭瘯锛?---"
+          echo "--- POST /api/gist/data with key (write empty array) ---"
           curl -sS -m 30 -X POST "https://poe-affix.pages.dev/api/gist/data" \
             -H "Content-Type: application/json" \
             -H "X-Sync-Key: $SYNC_KEY" \
