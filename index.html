@@ -206,6 +206,18 @@
             box-shadow: 0 0 10px rgba(201, 181, 120, 0.2);
         }
 
+        .filter-btn.filter-add {
+            border-style: dashed;
+            color: #7fbf7f;
+            border-color: #3a5a3a;
+        }
+
+        .filter-btn.filter-add:hover {
+            background: #1a2e1a;
+            border-color: #5a8a5a;
+            color: #9fdf9f;
+        }
+
         /* 统计 */
         .stats-bar {
             font-size: 0.85rem;
@@ -711,6 +723,20 @@
                     filterSection.appendChild(btn);
                 });
 
+                // 添加分类快捷按钮
+                const addCatBtn = document.createElement('button');
+                addCatBtn.className = 'filter-btn filter-add';
+                addCatBtn.textContent = '+ 添加分类';
+                addCatBtn.title = '快速新建一个分类';
+                addCatBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const newCat = prompt('输入新分类名称：');
+                    if (newCat && newCat.trim()) {
+                        openAddForm(newCat.trim());
+                    }
+                });
+                filterSection.appendChild(addCatBtn);
+
                 if (currentFilter !== '__all__' && !categories.includes(currentFilter)) {
                     currentFilter = '__all__';
                 }
@@ -973,11 +999,20 @@
                 return categorySelect.value.trim();
             }
 
-            function openAddForm() {
+            function openAddForm(presetCategory) {
                 editingId = null;
                 formTitle.textContent = '✨ 添加新词缀';
                 categorySelect.value = '';
                 inputCategory.value = '';
+                // 如果指定了预选分类（从筛选按钮快速添加），自动选中
+                if (presetCategory) {
+                    const cats = getAllCategories();
+                    if (cats.includes(presetCategory)) {
+                        categorySelect.value = presetCategory;
+                    } else {
+                        inputCategory.value = presetCategory;
+                    }
+                }
                 inputName.value = '';
                 inputValue.value = '';
                 addForm.classList.add('show');
@@ -1038,6 +1073,9 @@
                     if (index !== -1) {
                         affixes[index] = { ...affixes[index], category, name, value };
                     }
+                    saveToStorage();
+                    render();
+                    closeForm();
                 } else {
                     affixes.push({
                         id: generateId(),
@@ -1045,11 +1083,19 @@
                         name,
                         value
                     });
+                    saveToStorage();
+                    render();
+                    // 连续添加：保持表单打开，保留分类，清空名称和数值
+                    inputName.value = '';
+                    inputValue.value = '';
+                    // 把新建的分类同步到下拉框
+                    const cats = getAllCategories();
+                    if (cats.includes(category)) {
+                        categorySelect.value = category;
+                        inputCategory.value = '';
+                    }
+                    inputName.focus();
                 }
-
-                saveToStorage();
-                render();
-                closeForm();
             }
 
             function deleteAffix(id) {
