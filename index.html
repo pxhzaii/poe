@@ -748,10 +748,9 @@
 
                 row.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    const text = `${name} ${value}`;
-                    const ok = await copyToClipboard(text);
+                    const ok = await copyToClipboard(name);
                     if (ok) {
-                        showToast(text, '📋 已复制');
+                        showToast(name, '📋 已复制');
                     }
                 });
 
