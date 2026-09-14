@@ -1,0 +1,71 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install wrangler
+        run: npm install -g wrangler
+
+      - name: Ensure Pages project exists
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          CODE=$(curl -sS -o /dev/null -w "%{http_code}" -m 30 \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/poe-affix" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" || true)
+          if [ "$CODE" = "200" ]; then
+            echo "Pages 项目 poe-affix 已存在"
+          else
+            echo "创建 Pages 项目 poe-affix..."
+            npx wrangler pages project create poe-affix --production-branch main
+          fi
+
+      # 设置 Pages 环境变量（GIST_TOKEN / SYNC_KEY）
+      # 用 REST API：GET 现有 deployment_configs → 合并两个变量 → PATCH 回写
+      # 变量值经环境变量传入 node 进程，不进命令行参数、不 echo
+      - name: Set Pages env vars (GIST_TOKEN / SYNC_KEY)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          GIST_TOKEN_VALUE: ${{ secrets.GIST_TOKEN }}
+          SYNC_KEY_VALUE: ${{ secrets.SYNC_KEY }}
+        run: |
+          set -euo pipefail
+          node .github/scripts/set-pages-env.mjs
+          echo "环境变量已设置（GIST_TOKEN / SYNC_KEY，production + preview）"
+
+      - name: Deploy Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p public
+          cp index.html public/index.html
+          # functions 目录与 public 平级，wrangler pages deploy 会自动识别打包
+          npx wrangler pages deploy public --project-name poe-affix
+
+      - name: Verify deployment
+        run: |
+          echo "=== 等待部署生效 ==="
+          sleep 40
+          echo "--- Pages 首页状态码 ---"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev" || echo "Pages 暂不可达（可能延迟）"
+          echo "--- /api/gist 无密钥应 401 ---"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev/api/gist/gists" || true
