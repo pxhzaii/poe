@@ -26,30 +26,18 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          echo "--- 诊断：列出现有 Pages 项目 ---"
-          curl -sS -m 30 "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects?per_page=50" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | node -e '
-            let i="";process.stdin.on("data",c=>i+=c);process.stdin.on("end",()=>{
-              try{const j=JSON.parse(i);
-                if(!j.success){console.log("API error: "+JSON.stringify(j.errors));}
-                else{console.log("现有项目: "+(j.result||[]).map(p=>p.name).join(", ")||"(无)");}
-              }catch(e){console.log("解析失败:"+i.slice(0,300));}
-            })'
-          echo "--- 诊断：GET poe-affix ---"
-          CODE=$(curl -sS -o /tmp/get.json -w "%{http_code}" -m 30 \
+          CODE=$(curl -sS -o /dev/null -w "%{http_code}" -m 30 \
             "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/poe-affix" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" || true)
-          echo "GET status: $CODE"
           if [ "$CODE" = "200" ]; then
             echo "Pages 项目 poe-affix 已存在"
           else
-            echo "--- 诊断：尝试 REST API 直接创建（不用 wrangler）---"
-            CREATE=$(curl -sS -m 30 -X POST \
+            echo "创建 Pages 项目 poe-affix..."
+            curl -sS -m 30 -X POST \
               "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"name":"poe-affix","production_branch":"main"}')
-            echo "$CREATE" | node -e '
+              -d '{"name":"poe-affix","production_branch":"main"}' | node -e '
               let i="";process.stdin.on("data",c=>i+=c);process.stdin.on("end",()=>{
                 try{const j=JSON.parse(i);
                   if(!j.success){console.log("创建失败: "+JSON.stringify(j.errors));process.exit(1);}
@@ -58,19 +46,14 @@ jobs:
               })'
           fi
 
-      # 设置 Pages 环境变量（GIST_TOKEN / SYNC_KEY）
-      # 用 REST API：GET 现有 deployment_configs → 合并两个变量 → PATCH 回写
-      # 变量值经环境变量传入 node 进程，不进命令行参数、不 echo
-      - name: Set Pages env vars (GIST_TOKEN / SYNC_KEY)
+      - name: Set Pages env var (GIST_TOKEN)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           GIST_TOKEN_VALUE: ${{ secrets.GIST_TOKEN }}
-          SYNC_KEY_VALUE: ${{ secrets.SYNC_KEY }}
         run: |
           set -euo pipefail
           node .github/scripts/set-pages-env.mjs
-          echo "环境变量已设置（GIST_TOKEN / SYNC_KEY，production + preview）"
 
       - name: Deploy Pages
         env:
@@ -78,16 +61,18 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          # 仓库根有 index.html 和 functions/ 目录
-          # wrangler pages deploy 会自动扫描与 deploy-dir 平级的 functions/ 目录
-          # 仓库结构：index.html + functions/api/gist.js，所以直接用仓库根作为 deploy-dir
           npx wrangler pages deploy . --project-name poe-affix --commit-dirty=true
 
       - name: Verify deployment
         run: |
           echo "=== 等待部署生效 ==="
-          sleep 40
-          echo "--- Pages 首页状态码 ---"
-          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev" || echo "Pages 暂不可达（可能延迟）"
-          echo "--- /api/gist 无密钥应 401 ---"
-          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev/api/gist/gists" || true
+          sleep 30
+          echo "--- Pages 首页 ---"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev" || true
+          echo "--- /api/gist/data GET（应返回 JSON） ---"
+          curl -sS -m 30 "https://poe-affix.pages.dev/api/gist/data" | head -c 200 || true
+          echo ""
+          echo "--- /api/gist/data POST（写空数组测试） ---"
+          curl -sS -m 30 -X POST "https://poe-affix.pages.dev/api/gist/data" \
+            -H "Content-Type: application/json" -d '{"affixes":[]}' | head -c 200 || true
+          echo ""
