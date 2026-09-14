@@ -596,7 +596,6 @@
             const inputCategory = document.getElementById('inputCategory');
             const inputName = document.getElementById('inputName');
             const inputValue = document.getElementById('inputValue');
-            const categoryList = document.getElementById('categoryList');
             const categorySelect = document.getElementById('inputCategorySelect');
             const toggleAddFormBtn = document.getElementById('toggleAddForm');
             const saveAffixBtn = document.getElementById('saveAffixBtn');
@@ -699,13 +698,6 @@
                     option.value = cat;
                     option.textContent = cat;
                     categorySelect.appendChild(option);
-                });
-                // 同时更新 datalist（兼容旧逻辑）
-                categoryList.innerHTML = '';
-                categories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat;
-                    categoryList.appendChild(opt);
                 });
             }
 
