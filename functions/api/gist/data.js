@@ -1,15 +1,12 @@
 // Pages Function: /api/gist/data
-// GET  → 读取 Gist 中的词缀数据并返回 JSON
-// POST → 将前端发来的词缀数据写入 Gist
+// GET  鈫?璇诲彇 Gist 涓殑璇嶇紑鏁版嵁骞惰繑鍥?JSON
+// POST 鈫?灏嗗墠绔彂鏉ョ殑璇嶇紑鏁版嵁鍐欏叆 Gist
 //
-// 环境变量（Pages 项目设置）：
-//   GIST_TOKEN  — GitHub Token（gist 权限），服务端保管，前端无感知
+// 鐜鍙橀噺锛圥ages 椤圭洰璁剧疆锛夛細
+//   GIST_TOKEN  鈥?GitHub Token锛坓ist 鏉冮檺锛夛紝鏈嶅姟绔繚绠★紝鍓嶇鏃犳劅鐭?//   SYNC_KEY   鈥?鍚屾瀵嗙爜锛屽墠绔姹傚ご X-Sync-Key 蹇呴』涓庢鍖归厤
 //
-// Gist 管理策略：
-//   首次推送时自动创建 secret Gist（文件名 poe-affix-data.json），ID 存在 Gist description 中
-//   后续操作先列出用户 Gists，按 description 标记找到我们的数据 Gist
-//   数据明文 JSON 存储（Gist 本身是 secret，不公开）
-
+// Gist 绠＄悊绛栫暐锛?//   棣栨鎺ㄩ€佹椂鑷姩鍒涘缓 secret Gist锛堟枃浠跺悕 poe-affix-data.json锛夛紝ID 瀛樺湪 Gist description 涓?//   鍚庣画鎿嶄綔鍏堝垪鍑虹敤鎴?Gists锛屾寜 description 鏍囪鎵惧埌鎴戜滑鐨勬暟鎹?Gist
+//   鏁版嵁鏄庢枃 JSON 瀛樺偍锛圙ist 鏈韩鏄?secret锛屼笉鍏紑锛?
 const GITHUB_API = 'https://api.github.com';
 const GIST_FILE = 'poe-affix-data.json';
 const GIST_DESC = 'poe-affix-cloud-sync-do-not-delete';
@@ -45,20 +42,19 @@ async function gh(path, method, token, body) {
 }
 
 async function findOrCreateGist(token) {
-    // 列出用户所有 Gists，查找 description 匹配的
-    const listRes = await gh('/gists?per_page=100', 'GET', token);
+    // 鍒楀嚭鐢ㄦ埛鎵€鏈?Gists锛屾煡鎵?description 鍖归厤鐨?    const listRes = await gh('/gists?per_page=100', 'GET', token);
     if (listRes.ok && Array.isArray(listRes.json)) {
         const found = listRes.json.find(g => g.description === GIST_DESC);
         if (found) return found.id;
     }
-    // 没找到，创建新 Gist
+    // 娌℃壘鍒帮紝鍒涘缓鏂?Gist
     const createRes = await gh('/gists', 'POST', token, {
         description: GIST_DESC,
         public: false,
         files: { [GIST_FILE]: { content: JSON.stringify({ affixes: [], updated_at: null }) } }
     });
     if (!createRes.ok || !createRes.json || !createRes.json.id) {
-        throw new Error('创建 Gist 失败: ' + (createRes.json && createRes.json.message ? createRes.json.message : 'HTTP ' + createRes.status));
+        throw new Error('鍒涘缓 Gist 澶辫触: ' + (createRes.json && createRes.json.message ? createRes.json.message : 'HTTP ' + createRes.status));
     }
     return createRes.json.id;
 }
@@ -66,23 +62,28 @@ async function findOrCreateGist(token) {
 export async function onRequest(context) {
     const { request, env } = context;
 
-    // CORS 预检
+    // CORS 棰勬
     if (request.method === 'OPTIONS') {
         return new Response(null, { status: 204, headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type'
-        }});
+            'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Key'
+        });
     }
 
-    // 仅允许 GET 和 POST
+    // 鍚屾瀵嗙爜鏍￠獙
+    const clientKey = request.headers.get('X-Sync-Key');
+    if (!env.SYNC_KEY || !clientKey || clientKey !== env.SYNC_KEY) {
+        return json({ message: '瀵嗙爜涓嶆纭? }, 401);
+    }
+
+    // 浠呭厑璁?GET 鍜?POST
     if (request.method !== 'GET' && request.method !== 'POST') {
-        return json({ message: '仅支持 GET / POST' }, 405);
+        return json({ message: '浠呮敮鎸?GET / POST' }, 405);
     }
 
-    // 环境变量检查
-    if (!env.GIST_TOKEN) {
-        return json({ message: '服务端未配置 GIST_TOKEN' }, 500);
+    // 鐜鍙橀噺妫€鏌?    if (!env.GIST_TOKEN) {
+        return json({ message: '鏈嶅姟绔湭閰嶇疆 GIST_TOKEN' }, 500);
     }
 
     const token = env.GIST_TOKEN;
@@ -93,7 +94,7 @@ export async function onRequest(context) {
         if (request.method === 'GET') {
             const gistRes = await gh('/gists/' + gistId, 'GET', token);
             if (!gistRes.ok) {
-                return json({ message: '读取 Gist 失败: ' + (gistRes.json && gistRes.json.message ? gistRes.json.message : 'HTTP ' + gistRes.status) }, gistRes.status);
+                return json({ message: '璇诲彇 Gist 澶辫触: ' + (gistRes.json && gistRes.json.message ? gistRes.json.message : 'HTTP ' + gistRes.status) }, gistRes.status);
             }
             const file = gistRes.json.files && gistRes.json.files[GIST_FILE];
             if (!file || !file.content) {
@@ -114,11 +115,11 @@ export async function onRequest(context) {
                 files: { [GIST_FILE]: { content } }
             });
             if (!patchRes.ok) {
-                return json({ message: '写入 Gist 失败: ' + (patchRes.json && patchRes.json.message ? patchRes.json.message : 'HTTP ' + patchRes.status) }, patchRes.status);
+                return json({ message: '鍐欏叆 Gist 澶辫触: ' + (patchRes.json && patchRes.json.message ? patchRes.json.message : 'HTTP ' + patchRes.status) }, patchRes.status);
             }
             return json({ count: affixes.length, updated_at: new Date().toISOString() }, 200);
         }
     } catch (e) {
-        return json({ message: '操作失败: ' + (e.message || e) }, 500);
+        return json({ message: '鎿嶄綔澶辫触: ' + (e.message || e) }, 500);
     }
 }
