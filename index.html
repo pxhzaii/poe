@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流放之路 · 我的词缀库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #0b0e14;
+            color: #e3e6ed;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* 头部 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+            border-bottom: 1px solid #2a2f3a;
+            padding-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-weight: 400;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            color: #c9b578;
+            text-shadow: 0 0 6px rgba(201, 181, 120, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        /* 通用按钮 */
+        .btn {
+            background: #1e2530;
+            border: 1px solid #2e3848;
+            color: #c3cddf;
+            padding: 0.5rem 1.1rem;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.12s;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            background: #2a3442;
+            border-color: #4d6180;
+            color: #eaf0ff;
+        }
+
+        .btn-primary {
+            background: #2f4155;
+            border-color: #a58e4a;
+            color: #f2e9d8;
+        }
+
+        .btn-primary:hover {
+            background: #3c5168;
+            border-color: #c9b578;
+            box-shadow: 0 0 12px rgba(201, 181, 120, 0.25);
+        }
+
+        .btn-danger {
+            background: #2a1e22;
+            border-color: #5e3038;
+            color: #e0a8b0;
+        }
+
+        .btn-danger:hover {
+            background: #3d262c;
+            border-color: #8a4550;
+            color: #ffc8d0;
+        }
+
+        /* 添加表单 */
+        .add-form {
+            background: #10161f;
+            border: 1px solid #232b37;
+            border-radius: 16px;
+            padding: 1.2rem 1.2rem 1rem;
+            margin-bottom: 1.8rem;
+            display: none;
+        }
+
+        .add-form.show {
+            display: block;
+        }
+
+        .form-title {
+            font-size: 0.95rem;
+            color: #c9b578;
+            margin-bottom: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            flex: 1 0 150px;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            color: #7e8b9f;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select {
+            background: #181f2b;
+            border: 1px solid #2b3546;
+            color: #e3e6ed;
+            padding: 0.55rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.12s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #a58e4a;
+            box-shadow: 0 0 8px rgba(201, 181, 120, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: #4f5d72;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.9rem;
+        }
+
+        /* 筛选栏 */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: #181f2b;
+            border: 1px solid #2b3546;
+            color: #b3bed5;
+            padding: 0.45rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        .filter-btn:hover {
+            background: #1f2a38;
+            border-color: #4d6180;
+            color: #dee8ff;
+        }
+
+        .filter-btn.active {
+            background: #2f4155;
+            border-color: #a58e4a;
+            color: #f2e9d8;
+            box-shadow: 0 0 10px rgba(201, 181, 120, 0.2);
+        }
+
+        /* 统计 */
+        .stats-bar {
+            font-size: 0.85rem;
+            color: #6b7a92;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* 词缀网格 */
+        .affix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1rem;
+        }
+
+        /* 卡片 */
+        .affix-card {
+            background: #10161f;
+            border: 1px solid #232b37;
+            border-radius: 14px;
+            padding: 1rem 1rem 1rem;
+            transition: border 0.15s, background 0.15s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .affix-card:hover {
+            border-color: #3c4b5e;
+            background: #121a24;
+        }
+
+        .affix-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.7rem;
+        }
+
+        .affix-category {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7e8b9f;
+            font-weight: 500;
+            background: #1a212c;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 卡片操作按钮 */
+        .card-actions {
+            display: flex;
+            gap: 0.3rem;
+            opacity: 0.4;
+            transition: opacity 0.15s;
+        }
+
+        .affix-card:hover .card-actions {
+            opacity: 1;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: #6b7a92;
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 0.25rem 0.4rem;
+            border-radius: 6px;
+            transition: all 0.1s;
+            line-height: 1;
+        }
+
+        .icon-btn:hover {
+            background: #1f2a38;
+            color: #e3e6ed;
+        }
+
+        .icon-btn.delete:hover {
+            background: #3d262c;
+            color: #ff9aa8;
+        }
+
+        /* ========== 名称 + 数值 并列容器 ========== */
+        .affix-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: 0.2rem;
+        }
+
+        /* 通用复制项样式（名称与数值完全一致） */
+        .copy-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #1a212c;
+            border: 1px solid #2b3546;
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.12s;
+            user-select: none;
+            position: relative;
+        }
+
+        .copy-item:hover {
+            background: #212c3b;
+            border-color: #a58e4a;
+            box-shadow: 0 0 10px rgba(201, 181, 120, 0.15);
+        }
+
+        .copy-item:active {
+            transform: scale(0.995);
+            background: #283545;
+        }
+
+        /* 内容文字 */
+        .copy-item-text {
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            color: #e3e6ed;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        /* 复制小图标 */
+        .copy-item-icon {
+            font-size: 0.9rem;
+            opacity: 0.4;
+            transition: opacity 0.12s, color 0.12s;
+            flex-shrink: 0;
+        }
+
+        .copy-item:hover .copy-item-icon {
+            opacity: 1;
+            color: #c9b578;
+        }
+
+        /* 名称特殊一点：让它不至于完全一样，但同样大小 */
+        .copy-item.name .copy-item-text {
+            color: #f0e6d2;
+            font-weight: 450;
+        }
+
+        .copy-item.value .copy-item-text {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 1rem;
+            color: #f0e6d2;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #5b6a80;
+            border: 1px dashed #2b3546;
+            border-radius: 20px;
+            background: #0e131b;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        /* 复制反馈 */
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: #2a3b4c;
+            color: #e0e9ff;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
+            border: 1px solid #4a6180;
+            opacity: 0;
+            transition: opacity 0.15s, transform 0.15s;
+            pointer-events: none;
+            z-index: 999;
+            backdrop-filter: blur(6px);
+            max-width: 90vw;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 底部 */
+        .footer-note {
+            margin-top: 2.5rem;
+            color: #4b5a70;
+            font-size: 0.78rem;
+            text-align: center;
+            border-top: 1px solid #1d2530;
+            padding-top: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* KV 面板 */
+        .kv-panel {
+            background: #10161f;
+            border: 1px solid #232b37;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.8rem;
+            display: none;
+        }
+
+        .kv-panel.show {
+            display: block;
+        }
+
+        .kv-panel .kv-title {
+            font-size: 0.95rem;
+            color: #c9b578;
+            margin-bottom: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kv-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .kv-row .kv-field {
+            flex: 1 0 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .kv-field label {
+            font-size: 0.72rem;
+            color: #7e8b9f;
+            letter-spacing: 0.3px;
+        }
+
+        .kv-field input {
+            background: #181f2b;
+            border: 1px solid #2b3546;
+            color: #e3e6ed;
+            padding: 0.5rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .kv-field input:focus {
+            border-color: #a58e4a;
+            box-shadow: 0 0 8px rgba(201, 181, 120, 0.2);
+        }
+
+        .kv-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .kv-status {
+            font-size: 0.78rem;
+            color: #5b6a80;
+        }
+
+        .kv-status.ok { color: #7fbf7f; }
+        .kv-status.err { color: #e08a8a; }
+
+        @media (max-width: 600px) {
+            body { padding: 1.2rem 0.8rem; }
+            .header h1 { font-size: 1.25rem; }
+            .affix-grid { grid-template-columns: 1fr; }
+            .form-row { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>⚔️ 流放之路 · 我的词缀库</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="toggleAddForm">➕ 添加词缀</button>
+                <button class="btn" id="kvPanelBtn">☁️ Gist 云同步</button>
+                <button class="btn" id="exportBtn">📤 导出</button>
+                <button class="btn" id="importBtn">📥 导入</button>
+                <button class="btn btn-danger" id="clearAllBtn">🗑️ 清空</button>
+            </div>
+        </div>
+
+        <!-- 添加/编辑表单 -->
+        <div class="add-form" id="addForm">
+            <div class="form-title" id="formTitle">✨ 添加新词缀</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>分类</label>
+                    <input type="text" id="inputCategory" list="categoryList" placeholder="例如：负电甲/召唤衣 或 法血/戒指" autocomplete="off">
+                    <datalist id="categoryList"></datalist>
+                </div>
+                <div class="form-group" style="flex: 2 0 200px;">
+                    <label>词缀名称</label>
+                    <input type="text" id="inputName" placeholder="例如：增加最大生命" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>数值 / 内容</label>
+                    <input type="text" id="inputValue" placeholder="例如：22222" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" id="saveAffixBtn">💾 保存</button>
+                <button class="btn" id="cancelFormBtn">取消</button>
+            </div>
+        </div>
+
+        <!-- Gist 云同步面板 -->
+        <div class="kv-panel" id="kvPanel">
+            <div class="kv-title">☁️ GitHub Gist 云同步（AES 加密）</div>
+            <div class="kv-row">
+                <div class="kv-field">
+                    <label>GitHub Token（需 gist 权限）</label>
+                    <input type="password" id="kvToken" placeholder="ghp_..." autocomplete="off">
+                </div>
+                <div class="kv-field">
+                    <label>Gist ID（首次留空，推送时自动创建）</label>
+                    <input type="text" id="kvGistId" placeholder="如 6f37735690f82410a1b164ed7678bf45" autocomplete="off">
+                </div>
+            </div>
+            <div class="kv-row">
+                <div class="kv-field">
+                    <label>加密密码（拉取/推送都需要，未授权者无法解密）</label>
+                    <input type="password" id="kvPassphrase" placeholder="同步密码" autocomplete="off">
+                </div>
+            </div>
+            <div class="kv-actions">
+                <button class="btn btn-primary" id="kvSaveBtn">💾 保存配置</button>
+                <button class="btn" id="kvPullBtn">⬇️ 从云端拉取</button>
+                <button class="btn" id="kvPushBtn">⬆️ 推送到云端</button>
+                <span class="kv-status" id="kvStatus"></span>
+            </div>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-section" id="filterSection">
+            <button class="filter-btn active" data-filter="__all__">全部</button>
+        </div>
+
+        <!-- 统计 -->
+        <div class="stats-bar">
+            <span id="affixCount">共 0 条词缀</span>
+            <span style="font-size:0.78rem; color:#5b6a80;">数据保存在本地浏览器 · 点击名称或数值均可复制</span>
+        </div>
+
+        <!-- 词缀网格 -->
+        <div class="affix-grid" id="affixGrid"></div>
+
+        <!-- 底部 -->
+        <div class="footer-note">
+            <span>名称与数值并列 · 点击任意一个都能复制 · 分类可自定义 · 可绑定 Gist 云端同步（AES 加密） · 建议定期导出备份</span>
+        </div>
+    </div>
+
+    <!-- 复制反馈 -->
+    <div class="toast" id="toast">📋 已复制: <span id="toastValue"></span></div>
+
+    <script>
+        (function() {
+            const STORAGE_KEY = 'poe_my_affixes_v2';
+            const KV_CONFIG_KEY = 'poe_my_kv_config_v2';
+            const GIST_FILE = 'poe-affix-data.enc.json';
+
+            let affixes = [];
+            let currentFilter = '__all__';
+            let editingId = null;
+            let kvConfig = { token: '', gistId: '', passphrase: '' };
+
+            const grid = document.getElementById('affixGrid');
+            const toast = document.getElementById('toast');
+            const toastValueSpan = document.getElementById('toastValue');
+            const affixCountSpan = document.getElementById('affixCount');
+            const filterSection = document.getElementById('filterSection');
+            const addForm = document.getElementById('addForm');
+            const formTitle = document.getElementById('formTitle');
+            const inputCategory = document.getElementById('inputCategory');
+            const inputName = document.getElementById('inputName');
+            const inputValue = document.getElementById('inputValue');
+            const categoryList = document.getElementById('categoryList');
+            const toggleAddFormBtn = document.getElementById('toggleAddForm');
+            const saveAffixBtn = document.getElementById('saveAffixBtn');
+            const cancelFormBtn = document.getElementById('cancelFormBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+
+            // KV DOM
+            const kvPanel = document.getElementById('kvPanel');
+            const kvPanelBtn = document.getElementById('kvPanelBtn');
+            const kvGistId = document.getElementById('kvGistId');
+            const kvToken = document.getElementById('kvToken');
+            const kvPassphrase = document.getElementById('kvPassphrase');
+            const kvStatus = document.getElementById('kvStatus');
+            const kvSaveBtn = document.getElementById('kvSaveBtn');
+            const kvPullBtn = document.getElementById('kvPullBtn');
+            const kvPushBtn = document.getElementById('kvPushBtn');
+
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            }
+
+            function loadFromStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) {
+                            affixes = parsed;
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('读取本地数据失败', e);
+                }
+                affixes = [];
+                saveToStorage();
+            }
+
+            function loadKvConfig() {
+                try {
+                    const rawKv = localStorage.getItem(KV_CONFIG_KEY);
+                    if (rawKv) {
+                        const parsed = JSON.parse(rawKv);
+                        if (parsed && typeof parsed.token === 'string') {
+                            kvConfig = Object.assign({ token: '', gistId: '', passphrase: '' }, parsed);
+                        }
+                    }
+                } catch (e) { console.warn('读取 Gist 配置失败', e); }
+            }
+
+            function saveToStorage() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(affixes));
+                } catch (e) {
+                    console.error('保存本地数据失败', e);
+                    alert('保存失败，可能是浏览器存储空间不足或被禁用。');
+                }
+            }
+
+            function saveKvConfig() {
+                try {
+                    localStorage.setItem(KV_CONFIG_KEY, JSON.stringify(kvConfig));
+                } catch (e) {
+                    console.error('保存 KV 配置失败', e);
+                }
+            }
+
+            async function copyToClipboard(text) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (err) {
+                        console.warn('clipboard API 失败，尝试降级', err);
+                    }
+                }
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    return success;
+                } catch (err) {
+                    console.error('复制失败', err);
+                    return false;
+                }
+            }
+
+            let toastTimer = null;
+            function showToast(message, prefix = '📋 已复制') {
+                toastValueSpan.textContent = message;
+                toast.childNodes[0].textContent = prefix + ': ';
+                toast.classList.add('show');
+                if (toastTimer) clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 1600);
+            }
+
+            function getAllCategories() {
+                const set = new Set();
+                affixes.forEach(item => {
+                    if (item.category && item.category.trim()) {
+                        set.add(item.category.trim());
+                    }
+                });
+                return Array.from(set).sort();
+            }
+
+            function updateCategoryDatalist() {
+                const categories = getAllCategories();
+                categoryList.innerHTML = '';
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    categoryList.appendChild(option);
+                });
+            }
+
+            function renderFilterButtons() {
+                const allBtn = filterSection.querySelector('[data-filter="__all__"]');
+                filterSection.innerHTML = '';
+                filterSection.appendChild(allBtn);
+
+                const categories = getAllCategories();
+                categories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-btn';
+                    btn.dataset.filter = cat;
+                    btn.textContent = cat;
+                    filterSection.appendChild(btn);
+                });
+
+                if (currentFilter !== '__all__' && !categories.includes(currentFilter)) {
+                    currentFilter = '__all__';
+                }
+
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                const activeBtn = document.querySelector(`.filter-btn[data-filter="${currentFilter}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+                else {
+                    currentFilter = '__all__';
+                    allBtn.classList.add('active');
+                }
+            }
+
+            function bindFilterEvents() {
+                filterSection.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.filter-btn');
+                    if (!btn) return;
+                    const filter = btn.dataset.filter;
+                    if (filter === undefined) return;
+                    currentFilter = filter;
+                    render();
+                });
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function createCopyItem(text, type) {
+                const item = document.createElement('div');
+                item.className = `copy-item ${type}`;
+                item.title = `点击复制${type === 'name' ? '名称' : '数值'}`;
+
+                const textEl = document.createElement('span');
+                textEl.className = 'copy-item-text';
+                textEl.textContent = text;
+
+                const iconEl = document.createElement('span');
+                iconEl.className = 'copy-item-icon';
+                iconEl.textContent = '📋';
+
+                item.appendChild(textEl);
+                item.appendChild(iconEl);
+
+                item.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const ok = await copyToClipboard(text);
+                    if (ok) {
+                        showToast(
+                            text,
+                            type === 'name' ? '📋 已复制名称' : '📋 已复制数值'
+                        );
+                    }
+                });
+
+                return item;
+            }
+
+            // ---------- Gist 云同步（AES-GCM 加密） ----------
+            // 密码派生密钥：PBKDF2-SHA256，10万次迭代
+            async function deriveKey(passphrase, salt) {
+                const enc = new TextEncoder();
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
+                );
+                return crypto.subtle.deriveKey(
+                    { name: 'PBKDF2', hash: 'SHA-256', salt, iterations: 100000 },
+                    keyMaterial,
+                    { name: 'AES-GCM', length: 256 },
+                    false, ['encrypt', 'decrypt']
+                );
+            }
+
+            function b64encode(buf) {
+                const bytes = new Uint8Array(buf);
+                let s = '';
+                for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+                return btoa(s);
+            }
+
+            function b64decode(str) {
+                const raw = atob(str);
+                const bytes = new Uint8Array(raw.length);
+                for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+                return bytes;
+            }
+
+            // 加密词缀数据：返回 { v: 1, salt, iv, data } 的 JSON 字符串
+            async function encryptAffixes(passphrase, affixArr) {
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const key = await deriveKey(passphrase, salt);
+                const plain = new TextEncoder().encode(JSON.stringify({ affixes: affixArr, updated_at: new Date().toISOString() }));
+                const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
+                return JSON.stringify({
+                    v: 1,
+                    salt: b64encode(salt),
+                    iv: b64encode(iv),
+                    data: b64encode(cipher)
+                });
+            }
+
+            // 解密：密码错误抛异常
+            async function decryptAffixes(passphrase, encJson) {
+                const obj = JSON.parse(encJson);
+                if (obj.v !== 1) throw new Error('未知的数据版本');
+                const key = await deriveKey(passphrase, b64decode(obj.salt));
+                const plain = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: b64decode(obj.iv) }, key, b64decode(obj.data)
+                );
+                const decoded = JSON.parse(new TextDecoder().decode(plain));
+                if (!Array.isArray(decoded.affixes)) throw new Error('数据格式不正确');
+                return decoded;
+            }
+
+            // Gist API 请求
+            async function gistFetch(path, method, body) {
+                if (!kvConfig.token) throw new Error('请先填写 GitHub Token');
+                const headers = {
+                    'Authorization': 'Bearer ' + kvConfig.token,
+                    'Accept': 'application/vnd.github+json'
+                };
+                const opts = { method, headers };
+                if (body !== undefined) {
+                    headers['Content-Type'] = 'application/json';
+                    opts.body = JSON.stringify(body);
+                }
+                const resp = await fetch('https://api.github.com' + path, opts);
+                if (!resp.ok) {
+                    let msg = 'HTTP ' + resp.status;
+                    try {
+                        const j = await resp.json();
+                        if (j && j.message) msg = j.message;
+                    } catch (e) {}
+                    if (resp.status === 401) msg = 'Token 无效或无 gist 权限';
+                    if (resp.status === 404) msg = 'Gist 不存在（ID 填错或 Token 无权访问）';
+                    throw new Error(msg);
+                }
+                return resp.json();
+            }
+
+            function renderKvStatus() {
+                if (kvConfig.gistId) {
+                    kvStatus.textContent = '已绑定 Gist：' + kvConfig.gistId.slice(0, 8) + '…' + (kvConfig.passphrase ? '（已设密码）' : '');
+                    kvStatus.className = 'kv-status ok';
+                } else {
+                    kvStatus.textContent = '未绑定 Gist（首次推送会自动创建）';
+                    kvStatus.className = 'kv-status';
+                }
+            }
+
+            async function pullFromKv() {
+                if (!kvConfig.gistId) { alert('请先填写 Gist ID（或先推送一次自动创建）'); return; }
+                if (!kvConfig.passphrase) { alert('请先填写加密密码'); return; }
+                try {
+                    kvStatus.textContent = '拉取中…';
+                    kvStatus.className = 'kv-status';
+                    const gist = await gistFetch('/gists/' + kvConfig.gistId, 'GET');
+                    const file = gist.files && gist.files[GIST_FILE];
+                    if (!file) throw new Error('Gist 中没有数据文件（可能用错了 Gist）');
+                    const raw = await (await fetch(file.raw_url)).text();
+                    const decoded = await decryptAffixes(kvConfig.passphrase, raw);
+                    affixes = decoded.affixes;
+                    saveToStorage();
+                    render();
+                    kvStatus.textContent = '已拉取 ' + affixes.length + ' 条词缀' + (decoded.updated_at ? '（' + decoded.updated_at.slice(0, 19).replace('T', ' ') + '）' : '');
+                    kvStatus.className = 'kv-status ok';
+                    showToast('云端拉取成功', '☁️');
+                } catch (err) {
+                    kvStatus.textContent = '拉取失败：' + err.message;
+                    kvStatus.className = 'kv-status err';
+                    alert('拉取失败：' + err.message + (err.message.includes('format') || err.message.includes('operation') ? '（密码可能不正确）' : ''));
+                }
+            }
+
+            async function pushToKv() {
+                if (!kvConfig.token) { alert('请先填写 GitHub Token'); return; }
+                if (!kvConfig.passphrase) { alert('请先填写加密密码'); return; }
+                try {
+                    kvStatus.textContent = '加密推送中…';
+                    kvStatus.className = 'kv-status';
+                    const content = await encryptAffixes(kvConfig.passphrase, affixes);
+                    let gistId = kvConfig.gistId;
+                    if (gistId) {
+                        // 已有 Gist：更新文件
+                        await gistFetch('/gists/' + gistId, 'PATCH', {
+                            files: { [GIST_FILE]: { content } }
+                        });
+                    } else {
+                        // 首次：创建 secret Gist
+                        const created = await gistFetch('/gists', 'POST', {
+                            description: 'POE 词缀库云端备份（AES 加密）',
+                            public: false,
+                            files: { [GIST_FILE]: { content } }
+                        });
+                        gistId = created.id;
+                        kvConfig.gistId = gistId;
+                        saveKvConfig();
+                        kvGistId.value = gistId;
+                    }
+                    kvStatus.textContent = '推送成功（' + affixes.length + ' 条已加密）';
+                    kvStatus.className = 'kv-status ok';
+                    renderKvStatus();
+                    showToast('已加密推送到 Gist', '☁️');
+                } catch (err) {
+                    kvStatus.textContent = '推送失败：' + err.message;
+                    kvStatus.className = 'kv-status err';
+                    alert('推送失败：' + err.message);
+                }
+            }
+
+            function openKvPanel() {
+                kvToken.value = kvConfig.token;
+                kvGistId.value = kvConfig.gistId;
+                kvPassphrase.value = kvConfig.passphrase;
+                kvPanel.classList.add('show');
+                kvPanelBtn.textContent = '☁️ 关闭云同步';
+                renderKvStatus();
+            }
+
+            function closeKvPanel() {
+                kvPanel.classList.remove('show');
+                kvPanelBtn.textContent = '☁️ Gist 云同步';
+            }
+
+            function saveKvSettings() {
+                kvConfig.token = kvToken.value.trim();
+                kvConfig.gistId = kvGistId.value.trim();
+                kvConfig.passphrase = kvPassphrase.value;
+                saveKvConfig();
+                renderKvStatus();
+                showToast('同步配置已保存', '☁️');
+            }
+
+            // ---------- 渲染 ----------
+            function render() {
+                updateCategoryDatalist();
+                renderFilterButtons();
+
+                const filtered = currentFilter === '__all__'
+                    ? affixes
+                    : affixes.filter(item => item.category === currentFilter);
+
+                affixCountSpan.textContent = `共 ${affixes.length} 条词缀` +
+                    (currentFilter !== '__all__' ? `（当前显示 ${filtered.length} 条）` : '');
+
+                grid.innerHTML = '';
+
+                if (filtered.length === 0) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    if (affixes.length === 0) {
+                        emptyDiv.innerHTML = '📭 还没有任何词缀<br><span style="font-size:0.85rem;color:#4f5d72;">点击右上角「添加词缀」开始创建，分类可自定义</span>';
+                    } else {
+                        emptyDiv.innerHTML = '🔍 该分类下没有词缀';
+                    }
+                    grid.appendChild(emptyDiv);
+                    return;
+                }
+
+                filtered.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'affix-card';
+                    card.dataset.id = item.id;
+
+                    // 头部：分类 + 操作按钮
+                    const cardHeader = document.createElement('div');
+                    cardHeader.className = 'affix-card-header';
+
+                    const catEl = document.createElement('span');
+                    catEl.className = 'affix-category';
+                    catEl.textContent = item.category || '未分类';
+                    catEl.title = item.category || '未分类';
+
+                    const actions = document.createElement('div');
+                    actions.className = 'card-actions';
+
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'icon-btn edit';
+                    editBtn.title = '编辑';
+                    editBtn.innerHTML = '✏️';
+                    editBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        startEdit(item.id);
+                    });
+
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'icon-btn delete';
+                    delBtn.title = '删除';
+                    delBtn.innerHTML = '🗑️';
+                    delBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteAffix(item.id);
+                    });
+
+                    actions.appendChild(editBtn);
+                    actions.appendChild(delBtn);
+
+                    cardHeader.appendChild(catEl);
+                    cardHeader.appendChild(actions);
+
+                    // ========== 名称 + 数值 并列 ==========
+                    const contentWrap = document.createElement('div');
+                    contentWrap.className = 'affix-content';
+
+                    const nameItem = createCopyItem(item.name, 'name');
+                    const valueItem = createCopyItem(item.value, 'value');
+
+                    contentWrap.appendChild(nameItem);
+                    contentWrap.appendChild(valueItem);
+
+                    card.appendChild(cardHeader);
+                    card.appendChild(contentWrap);
+
+                    grid.appendChild(card);
+                });
+            }
+
+            function openAddForm() {
+                editingId = null;
+                formTitle.textContent = '✨ 添加新词缀';
+                inputCategory.value = '';
+                inputName.value = '';
+                inputValue.value = '';
+                addForm.classList.add('show');
+                inputName.focus();
+            }
+
+            function closeForm() {
+                addForm.classList.remove('show');
+                editingId = null;
+                inputName.value = '';
+                inputValue.value = '';
+            }
+
+            function startEdit(id) {
+                const item = affixes.find(a => a.id === id);
+                if (!item) return;
+                editingId = id;
+                formTitle.textContent = '✏️ 编辑词缀';
+                inputCategory.value = item.category || '';
+                inputName.value = item.name;
+                inputValue.value = item.value;
+                addForm.classList.add('show');
+                inputName.focus();
+                addForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            function saveAffix() {
+                const category = inputCategory.value.trim();
+                const name = inputName.value.trim();
+                const value = inputValue.value.trim();
+
+                if (!category) {
+                    alert('请输入分类（例如：负电甲/召唤衣、法血/戒指）');
+                    inputCategory.focus();
+                    return;
+                }
+                if (!name) {
+                    alert('请输入词缀名称');
+                    inputName.focus();
+                    return;
+                }
+                if (!value) {
+                    alert('请输入数值/内容');
+                    inputValue.focus();
+                    return;
+                }
+
+                if (editingId) {
+                    const index = affixes.findIndex(a => a.id === editingId);
+                    if (index !== -1) {
+                        affixes[index] = { ...affixes[index], category, name, value };
+                    }
+                } else {
+                    affixes.push({
+                        id: generateId(),
+                        category,
+                        name,
+                        value
+                    });
+                }
+
+                saveToStorage();
+                render();
+                closeForm();
+            }
+
+            function deleteAffix(id) {
+                const item = affixes.find(a => a.id === id);
+                if (!item) return;
+                if (!confirm(`确定删除词缀「${item.name}」？`)) return;
+                affixes = affixes.filter(a => a.id !== id);
+                saveToStorage();
+                render();
+                if (editingId === id) closeForm();
+            }
+
+            function clearAll() {
+                if (affixes.length === 0) {
+                    alert('已经是空的了');
+                    return;
+                }
+                if (!confirm(`确定要清空所有 ${affixes.length} 条词缀吗？此操作不可恢复！`)) return;
+                if (!confirm('再次确认：真的要全部删除吗？')) return;
+                affixes = [];
+                saveToStorage();
+                render();
+                closeForm();
+            }
+
+            function exportData() {
+                const dataStr = JSON.stringify(affixes, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const date = new Date().toISOString().slice(0, 10);
+                a.href = url;
+                a.download = `poe-affixes-${date}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('已导出 JSON 文件', '📤');
+            }
+
+            function importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        try {
+                            const imported = JSON.parse(ev.target.result);
+                            if (!Array.isArray(imported)) {
+                                alert('文件格式不正确，应为词缀数组');
+                                return;
+                            }
+                            const valid = imported.filter(item =>
+                                item && typeof item.name === 'string' && typeof item.value === 'string'
+                            ).map(item => ({
+                                id: item.id || generateId(),
+                                category: (item.category && typeof item.category === 'string') ? item.category.trim() : '未分类',
+                                name: item.name,
+                                value: item.value
+                            }));
+                            if (valid.length === 0) {
+                                alert('没有找到有效的词缀数据');
+                                return;
+                            }
+                            if (!confirm(`即将导入 ${valid.length} 条词缀。\n当前已有 ${affixes.length} 条，导入后总数将为 ${affixes.length + valid.length} 条。是否继续？`)) return;
+                            affixes = affixes.concat(valid);
+                            saveToStorage();
+                            render();
+                            showToast(`成功导入 ${valid.length} 条`, '📥');
+                        } catch (err) {
+                            alert('解析文件失败：' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+                input.click();
+            }
+
+            function bindEvents() {
+                toggleAddFormBtn.addEventListener('click', () => {
+                    if (addForm.classList.contains('show')) {
+                        closeForm();
+                    } else {
+                        openAddForm();
+                    }
+                });
+
+                saveAffixBtn.addEventListener('click', saveAffix);
+                cancelFormBtn.addEventListener('click', closeForm);
+
+                inputName.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        inputValue.focus();
+                    }
+                });
+                inputValue.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        saveAffix();
+                    }
+                });
+
+                // KV 面板
+                kvPanelBtn.addEventListener('click', () => {
+                    if (kvPanel.classList.contains('show')) {
+                        closeKvPanel();
+                    } else {
+                        openKvPanel();
+                    }
+                });
+                kvSaveBtn.addEventListener('click', saveKvSettings);
+                kvPullBtn.addEventListener('click', pullFromKv);
+                kvPushBtn.addEventListener('click', pushToKv);
+
+                exportBtn.addEventListener('click', exportData);
+                importBtn.addEventListener('click', importData);
+                clearAllBtn.addEventListener('click', clearAll);
+
+                toast.addEventListener('click', () => {
+                    toast.classList.remove('show');
+                    if (toastTimer) clearTimeout(toastTimer);
+                });
+
+                bindFilterEvents();
+            }
+
+            function init() {
+                loadFromStorage();
+                loadKvConfig();
+                bindEvents();
+                render();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
