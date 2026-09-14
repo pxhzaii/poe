@@ -232,7 +232,7 @@
         /* 词缀网格 */
         .affix-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            grid-template-columns: 1fr;
             gap: 1rem;
         }
 
@@ -354,8 +354,8 @@
         .affix-row .affix-value {
             flex-shrink: 0;
             font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-            font-size: 0.95rem;
-            color: #f0e6d2;
+            font-size: 0.9rem;
+            color: #8a9aaf;
             white-space: nowrap;
         }
 
@@ -544,8 +544,8 @@
                     <input type="text" id="inputName" placeholder="例如：增加最大生命" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label>数值 / 内容</label>
-                    <input type="text" id="inputValue" placeholder="例如：22222" autocomplete="off">
+                    <label>数值 / 内容（可选）</label>
+                    <input type="text" id="inputValue" placeholder="可选" autocomplete="off">
                 </div>
             </div>
             <div class="form-actions">
@@ -762,22 +762,24 @@
             function createAffixRow(name, value) {
                 const row = document.createElement('div');
                 row.className = 'affix-row';
-                row.title = `点击复制：${name} ${value}`;
+                row.title = `点击复制：${name}`;
 
                 const nameEl = document.createElement('span');
                 nameEl.className = 'affix-name';
                 nameEl.textContent = name;
 
-                const valueEl = document.createElement('span');
-                valueEl.className = 'affix-value';
-                valueEl.textContent = value;
+                row.appendChild(nameEl);
+
+                if (value && value.trim()) {
+                    const valueEl = document.createElement('span');
+                    valueEl.className = 'affix-value';
+                    valueEl.textContent = value;
+                    row.appendChild(valueEl);
+                }
 
                 const iconEl = document.createElement('span');
                 iconEl.className = 'affix-copy-icon';
                 iconEl.textContent = '📋';
-
-                row.appendChild(nameEl);
-                row.appendChild(valueEl);
                 row.appendChild(iconEl);
 
                 row.addEventListener('click', async (e) => {
@@ -1052,11 +1054,6 @@
                 if (!name) {
                     alert('请输入词缀名称');
                     inputName.focus();
-                    return;
-                }
-                if (!value) {
-                    alert('请输入数值/内容');
-                    inputValue.focus();
                     return;
                 }
 
