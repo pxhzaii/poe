@@ -37,16 +37,16 @@ GitHub Token 和同步密码均由服务端（Cloudflare Pages 环境变量）�
 
 仓库内置 GitHub Actions 自动部署，推送 main 分支或手动触发即可。
 
-需要在仓库 Settings → Secrets → Actions 配置 4 个 secrets：
+需要在 GitHub 仓库 Settings → Secrets → Actions 配置 4 个 secrets（Cloudflare Pages 项目的 secret 由工作流自动写入，无需手动配置）：
 
-| Secret | 说明 |
-|--------|------|
-| `CF_API_TOKEN` | Cloudflare API Token（Pages 权限） |
-| `CF_ACCOUNT_ID` | Cloudflare 账户 ID |
-| `GIST_TOKEN` | GitHub Token（gist 权限，写入 Pages 环境变量） |
-| `SYNC_KEY` | 同步密码，写入 Pages 环境变量，校验前端请求头 |
+| Secret | 说明 | 获取方式 |
+|--------|------|----------|
+| `CF_API_TOKEN` | Cloudflare API Token（Pages 权限） | Cloudflare 控制台 → My Profile → API Tokens → Create Token，选 Edit Cloudflare Workers and Pages 模板 |
+| `CF_ACCOUNT_ID` | Cloudflare 账户 ID | Cloudflare 控制台首页右侧栏，或任意域名 Overview 页面右下角 |
+| `GIST_TOKEN` | GitHub Token（gist 权限） | GitHub → Settings → Developer settings → Personal access tokens (classic)，勾选 gist 权限 |
+| `SYNC_KEY` | 同步密码 | 自定义一个密码字符串，前端输入同样的密码才能推送/拉取 |
 
-工作流自动：创建 Pages 项目 → 写入环境变量（GIST_TOKEN + SYNC_KEY）→ 部署 → 验证。
+工作流自动：创建 Pages 项目 → 写入 Pages secret（GIST_TOKEN + SYNC_KEY）→ 部署 → 验证。
 
 ## 数据格式
 
