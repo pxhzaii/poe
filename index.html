@@ -547,8 +547,8 @@
             <div class="kv-title">☁️ GitHub Gist 云同步（AES 加密）</div>
             <div class="kv-row">
                 <div class="kv-field">
-                    <label>GitHub Token（需 gist 权限）</label>
-                    <input type="password" id="kvToken" placeholder="ghp_..." autocomplete="off">
+                    <label>GitHub Token（需 gist 权限；线上版可留空，由服务端保管）</label>
+                    <input type="password" id="kvToken" placeholder="ghp_...（线上部署留空）" autocomplete="off">
                 </div>
                 <div class="kv-field">
                     <label>Gist ID（首次留空，推送时自动创建）</label>
@@ -557,7 +557,7 @@
             </div>
             <div class="kv-row">
                 <div class="kv-field">
-                    <label>加密密码（拉取/推送都需要，未授权者无法解密）</label>
+                    <label>同步密钥（拉取/推送都需要，未授权者无法读写）</label>
                     <input type="password" id="kvPassphrase" placeholder="同步密码" autocomplete="off">
                 </div>
             </div>
@@ -597,6 +597,9 @@
             const STORAGE_KEY = 'poe_my_affixes_v2';
             const KV_CONFIG_KEY = 'poe_my_kv_config_v2';
             const GIST_FILE = 'poe-affix-data.enc.json';
+            // 部署模式检测：无 file: 协议且同源有 /api/gist 时走服务端代理（Token 存在 Pages 环境变量）
+            const IS_ONLINE = location.protocol !== 'file:' &&
+                (location.hostname.endsWith('.pages.dev') || localStorage.getItem('poe_use_proxy') === '1');
 
             let affixes = [];
             let currentFilter = '__all__';
@@ -858,6 +861,9 @@
                 });
             }
 
+            // 兼容旧的加密密码字段名
+            encryptAffixes.passphraseLabel = '同步密钥';
+
             // 解密：密码错误抛异常
             async function decryptAffixes(passphrase, encJson) {
                 const obj = JSON.parse(encJson);
@@ -871,19 +877,20 @@
                 return decoded;
             }
 
-            // Gist API 请求
+            // Gist API 请求（线上版自动走同源 /api/gist 代理，Token 无需填写；本地 file: 直连 GitHub）
             async function gistFetch(path, method, body) {
-                if (!kvConfig.token) throw new Error('请先填写 GitHub Token');
-                const headers = {
-                    'Authorization': 'Bearer ' + kvConfig.token,
-                    'Accept': 'application/vnd.github+json'
-                };
+                const base = IS_ONLINE && !kvConfig.token
+                    ? location.origin + '/api/gist'
+                    : 'https://api.github.com';
+                const headers = { 'Accept': 'application/vnd.github+json' };
+                if (!(IS_ONLINE && !kvConfig.token)) headers['Authorization'] = 'Bearer ' + (kvConfig.token || '');
+                if (kvConfig.passphrase) headers['X-Sync-Key'] = kvConfig.passphrase;
                 const opts = { method, headers };
                 if (body !== undefined) {
                     headers['Content-Type'] = 'application/json';
                     opts.body = JSON.stringify(body);
                 }
-                const resp = await fetch('https://api.github.com' + path, opts);
+                const resp = await fetch(base + path, opts);
                 if (!resp.ok) {
                     let msg = 'HTTP ' + resp.status;
                     try {
@@ -891,7 +898,7 @@
                         if (j && j.message) msg = j.message;
                     } catch (e) {}
                     if (resp.status === 401) msg = 'Token 无效或无 gist 权限';
-                    if (resp.status === 404) msg = 'Gist 不存在（ID 填错或 Token 无权访问）';
+                    if (resp.status === 404) msg = 'Gist 不存在（ID 填错或无权访问）';
                     throw new Error(msg);
                 }
                 return resp.json();
@@ -899,24 +906,28 @@
 
             function renderKvStatus() {
                 if (kvConfig.gistId) {
-                    kvStatus.textContent = '已绑定 Gist：' + kvConfig.gistId.slice(0, 8) + '…' + (kvConfig.passphrase ? '（已设密码）' : '');
+                    kvStatus.textContent = '已绑定 Gist：' + kvConfig.gistId.slice(0, 8) + '…' + (kvConfig.passphrase ? '（已设密钥）' : '');
                     kvStatus.className = 'kv-status ok';
                 } else {
-                    kvStatus.textContent = '未绑定 Gist（首次推送会自动创建）';
+                    kvStatus.textContent = IS_ONLINE && !kvConfig.token
+                        ? '在线模式：服务端托管 Token，首次推送自动建 Gist'
+                        : '未绑定 Gist（首次推送会自动创建）';
                     kvStatus.className = 'kv-status';
                 }
             }
 
             async function pullFromKv() {
                 if (!kvConfig.gistId) { alert('请先填写 Gist ID（或先推送一次自动创建）'); return; }
-                if (!kvConfig.passphrase) { alert('请先填写加密密码'); return; }
+                if (!kvConfig.passphrase) { alert('请先填写同步密钥'); return; }
                 try {
                     kvStatus.textContent = '拉取中…';
                     kvStatus.className = 'kv-status';
                     const gist = await gistFetch('/gists/' + kvConfig.gistId, 'GET');
                     const file = gist.files && gist.files[GIST_FILE];
                     if (!file) throw new Error('Gist 中没有数据文件（可能用错了 Gist）');
-                    const raw = await (await fetch(file.raw_url)).text();
+                    const rawResp = await fetch(file.raw_url);
+                    if (!rawResp.ok) throw new Error('下载密文失败：HTTP ' + rawResp.status);
+                    const raw = await rawResp.text();
                     const decoded = await decryptAffixes(kvConfig.passphrase, raw);
                     affixes = decoded.affixes;
                     saveToStorage();
@@ -932,8 +943,8 @@
             }
 
             async function pushToKv() {
-                if (!kvConfig.token) { alert('请先填写 GitHub Token'); return; }
-                if (!kvConfig.passphrase) { alert('请先填写加密密码'); return; }
+                if (!kvConfig.token && !(IS_ONLINE)) { alert('本地文件模式请先填写 GitHub Token，或改用线上版'); return; }
+                if (!kvConfig.passphrase) { alert('请先填写同步密钥'); return; }
                 try {
                     kvStatus.textContent = '加密推送中…';
                     kvStatus.className = 'kv-status';
