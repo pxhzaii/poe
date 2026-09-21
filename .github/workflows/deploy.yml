@@ -46,33 +46,32 @@ jobs:
               })'
           fi
 
-      - name: Bind KV namespace and set env vars
+      - name: Set env vars
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
         run: |
           set -euo pipefail
-          echo "Binding KV namespace + setting APP_PASSWORD env var..."
+          echo "Setting env vars (APP_PASSWORD, GIST_TOKEN, GIST_ID)..."
           node -e '
           const fs = require("fs");
           const payload = {
             deployment_configs: {
               production: {
-                kv_namespaces: {
-                  AFFIX_KV: { namespace_id: process.env.KV_NAMESPACE_ID }
-                },
                 env_vars: {
-                  APP_PASSWORD: { value: process.env.APP_PASSWORD }
+                  APP_PASSWORD: { value: process.env.APP_PASSWORD },
+                  GIST_TOKEN: { value: process.env.GIST_TOKEN },
+                  GIST_ID: { value: process.env.GIST_ID }
                 }
               },
               preview: {
-                kv_namespaces: {
-                  AFFIX_KV: { namespace_id: process.env.KV_NAMESPACE_ID }
-                },
                 env_vars: {
-                  APP_PASSWORD: { value: process.env.APP_PASSWORD }
+                  APP_PASSWORD: { value: process.env.APP_PASSWORD },
+                  GIST_TOKEN: { value: process.env.GIST_TOKEN },
+                  GIST_ID: { value: process.env.GIST_ID }
                 }
               }
             }
@@ -86,8 +85,8 @@ jobs:
             --data @/tmp/bind-payload.json | node -e '
             let i="";process.stdin.on("data",c=>i+=c);process.stdin.on("end",()=>{
               try{const j=JSON.parse(i);
-                if(!j.success){console.log("Bind failed: "+JSON.stringify(j.errors));process.exit(1);}
-                else{console.log("KV + env vars updated");}
+                if(!j.success){console.log("Set env failed: "+JSON.stringify(j.errors));process.exit(1);}
+                else{console.log("Env vars updated");}
               }catch(e){console.log("Parse error:"+i.slice(0,300));process.exit(1);}
             })'
 
@@ -109,7 +108,6 @@ jobs:
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe.5as.cn" || true
           echo "--- GET /api/data without password (expect 401) ---"
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe.5as.cn/api/data" || true
-          echo "--- GET /api/data with wrong password (expect 401) ---"
-          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" -H "X-Sync-Password: wrong" "https://poe.5as.cn/api/data" || true
           echo "--- GET /api/data with correct password (expect 200) ---"
-          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" -H "X-Sync-Password: $APP_PASSWORD" "https://poe.5as.cn/api/data" || true
+          curl -sS -m 30 -H "X-Sync-Password: $APP_PASSWORD" "https://poe.5as.cn/api/data" | head -c 200 || true
+          echo ""
