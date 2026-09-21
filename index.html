@@ -671,29 +671,24 @@
             </div>
         </div>
 
-        <!-- 登录面板（未登录时显示） -->
+        <!-- 密码面板（未输入密码时显示） -->
         <div class="auth-panel" id="authPanel">
-            <h2>☁️ 词缀库多用户版</h2>
-            <div class="auth-sub">登录后数据云端同步，多设备可用</div>
+            <h2>☁️ 词缀库云端同步</h2>
+            <div class="auth-sub">输入密码后可推送/拉取云端数据</div>
             <div class="auth-error" id="authError"></div>
             <div class="auth-form-group">
-                <label>用户名</label>
-                <input type="text" id="authUsername" placeholder="2-20位，中英文/数字/下划线" autocomplete="username">
-            </div>
-            <div class="auth-form-group">
                 <label>密码</label>
-                <input type="password" id="authPassword" placeholder="至少4位" autocomplete="current-password">
+                <input type="password" id="authPassword" placeholder="输入云端同步密码" autocomplete="current-password">
             </div>
             <div class="auth-actions">
-                <button class="btn btn-primary" id="loginBtn">登录</button>
-                <button class="btn" id="registerBtn">注册</button>
+                <button class="btn btn-primary" id="loginBtn">确认密码</button>
             </div>
             <div class="auth-hint">
-                · 数据按用户隔离，互不可见<br>
-                · 未登录时仅保存在本地浏览器
+                · 输入密码后可推送/拉取云端数据<br>
+                · 不输入密码也可本地使用
             </div>
             <div class="auth-toggle-line">
-                <button id="skipLoginBtn">暂不登录，先用本地模式 →</button>
+                <button id="skipLoginBtn">暂不输入密码，先用本地模式 →</button>
             </div>
         </div>
 
@@ -723,7 +718,7 @@
 
         <!-- 底部 -->
         <div class="footer-note">
-            <span id="footerText">名称点击复制 · 选分类后在添加栏输入词缀回车即可 · ✏️行内编辑 · 登录后可云端同步</span>
+            <span id="footerText">名称点击复制 · 选分类后在添加栏输入词缀回车即可 · ✏️行内编辑 · 输入密码后可云端同步</span>
         </div>
         </div>
     </div>
@@ -749,8 +744,7 @@
             let currentSub = '__all__';    // 当前二级分类
             let editingId = null;
             let syncing = false;
-            let currentUser = null;        // { username, token }
-            let authMode = 'login';        // login | register
+            let cloudPassword = null;     // 云端同步密码（不保存到 localStorage）
 
             // ========== DOM ==========
             const grid = document.getElementById('affixGrid');
@@ -768,10 +762,8 @@
             const authPanel = document.getElementById('authPanel');
             const mainContent = document.getElementById('mainContent');
             const authError = document.getElementById('authError');
-            const authUsername = document.getElementById('authUsername');
             const authPassword = document.getElementById('authPassword');
             const loginBtnEl = document.getElementById('loginBtn');
-            const registerBtnEl = document.getElementById('registerBtn');
             const skipLoginBtn = document.getElementById('skipLoginBtn');
 
             // ========== 工具 ==========
@@ -898,8 +890,8 @@
 
             // ========== 云同步 API ==========
             function getAuthHeaders() {
-                if (!currentUser || !currentUser.token) return {};
-                return { 'Authorization': 'Bearer ' + currentUser.token };
+                if (!cloudPassword) return {};
+                return { 'X-Sync-Password': cloudPassword };
             }
 
             async function apiRequest(method, path, body) {
@@ -931,46 +923,28 @@
             }
 
             async function doLogin() {
-                const username = authUsername.value.trim();
                 const password = authPassword.value;
-                if (!username || !password) {
-                    showAuthError('请输入用户名和密码');
+                if (!password) {
+                    showAuthError('请输入密码');
                     return;
                 }
                 loginBtnEl.disabled = true;
-                loginBtnEl.textContent = '⏳ 登录中…';
+                loginBtnEl.textContent = '⏳ 验证中…';
                 try {
-                    const res = await apiRequest('POST', '/api/login', { username, password });
-                    currentUser = { username: res.username, token: res.token };
-                    localStorage.setItem('poe_auth', JSON.stringify(currentUser));
+                    // 用密码尝试拉取云端数据来验证密码是否正确
+                    const res = await apiRequest('GET', '/api/data');
+                    // 密码正确（后端返回 200）
+                    cloudPassword = password;
                     enterMainApp();
                 } catch (err) {
-                    showAuthError(err.message);
+                    if (err.status === 401) {
+                        showAuthError('密码错误');
+                    } else {
+                        showAuthError(err.message);
+                    }
                 } finally {
                     loginBtnEl.disabled = false;
-                    loginBtnEl.textContent = '登录';
-                }
-            }
-
-            async function doRegister() {
-                const username = authUsername.value.trim();
-                const password = authPassword.value;
-                if (!username || !password) {
-                    showAuthError('请输入用户名和密码');
-                    return;
-                }
-                registerBtnEl.disabled = true;
-                registerBtnEl.textContent = '⏳ 注册中…';
-                try {
-                    const res = await apiRequest('POST', '/api/register', { username, password });
-                    currentUser = { username: res.username, token: res.token };
-                    localStorage.setItem('poe_auth', JSON.stringify(currentUser));
-                    enterMainApp();
-                } catch (err) {
-                    showAuthError(err.message);
-                } finally {
-                    registerBtnEl.disabled = false;
-                    registerBtnEl.textContent = '注册';
+                    loginBtnEl.textContent = '确认密码';
                 }
             }
 
@@ -984,7 +958,7 @@
             }
 
             function updateHeaderForUser() {
-                // 在头部显示用户名 + 推送/拉取按钮（登录后才显示）
+                // 在头部显示推送/拉取按钮（输入密码后才显示）
                 let userArea = document.getElementById('userArea');
                 if (!userArea) {
                     userArea = document.createElement('div');
@@ -992,12 +966,12 @@
                     userArea.style.cssText = 'display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;';
                     document.querySelector('.header-actions').prepend(userArea);
                 }
-                if (currentUser && currentUser.username) {
+                if (cloudPassword) {
                     userArea.innerHTML = '';
-                    const nameSpan = document.createElement('span');
-                    nameSpan.textContent = '👤 ' + currentUser.username;
-                    nameSpan.style.cssText = 'font-size:0.85rem;color:#2563eb;padding:0.3rem 0.7rem;background:#eef5ff;border-radius:20px;border:1px solid #c6dcff;';
-                    userArea.appendChild(nameSpan);
+                    const cloudTag = document.createElement('span');
+                    cloudTag.textContent = '☁️ 已连接云端';
+                    cloudTag.style.cssText = 'font-size:0.85rem;color:#2563eb;padding:0.3rem 0.7rem;background:#eef5ff;border-radius:20px;border:1px solid #c6dcff;';
+                    userArea.appendChild(cloudTag);
 
                     const pushBtn = document.createElement('button');
                     pushBtn.className = 'btn';
@@ -1013,7 +987,7 @@
 
                     const logoutBtn = document.createElement('button');
                     logoutBtn.className = 'btn';
-                    logoutBtn.textContent = '🚪 退出';
+                    logoutBtn.textContent = '🔒 清除密码';
                     logoutBtn.addEventListener('click', doLogout);
                     userArea.appendChild(logoutBtn);
                 } else {
@@ -1026,8 +1000,7 @@
             }
 
             function doLogout() {
-                currentUser = null;
-                localStorage.removeItem('poe_auth');
+                cloudPassword = null;
                 authPanel.style.display = 'block';
                 mainContent.style.display = 'none';
                 updateHeaderForUser();
@@ -1035,7 +1008,7 @@
 
             // 静默推送云端（不加确认弹窗，删除/添加等操作后自动同步）
             async function syncToCloud() {
-                if (!currentUser || !currentUser.token || syncing) return;
+                if (!cloudPassword || syncing) return;
                 try {
                     await apiRequest('POST', '/api/data', { affixes, categories });
                 } catch (e) {
@@ -1045,11 +1018,11 @@
 
             async function pushCloud() {
                 if (syncing) return;
-                if (!currentUser || !currentUser.token) {
-                    alert('请先登录');
+                if (!cloudPassword) {
+                    alert('请先输入密码');
                     return;
                 }
-                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端，会覆盖云端「${currentUser.username}」名下旧数据。继续？`)) return;
+                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端，会覆盖云端旧数据。继续？`)) return;
                 syncing = true;
                 try {
                     await apiRequest('POST', '/api/data', { affixes, categories });
@@ -1063,8 +1036,8 @@
 
             async function pullCloud() {
                 if (syncing) return;
-                if (!currentUser || !currentUser.token) {
-                    alert('请先登录');
+                if (!cloudPassword) {
+                    alert('请先输入密码');
                     return;
                 }
                 syncing = true;
@@ -1683,9 +1656,8 @@
                     render();
                 });
 
-                // 登录/注册
+                // 密码验证
                 loginBtnEl.addEventListener('click', doLogin);
-                registerBtnEl.addEventListener('click', doRegister);
                 skipLoginBtn.addEventListener('click', () => {
                     enterLocalMode();
                 });
@@ -1706,7 +1678,7 @@
             function enterLocalMode() {
                 authPanel.style.display = 'none';
                 mainContent.style.display = 'block';
-                currentUser = null;
+                cloudPassword = null;
                 updateHeaderForUser();
                 render();
             }
@@ -1716,20 +1688,9 @@
                 loadFromStorage();
                 bindEvents();
 
-                // 尝试恢复登录状态
-                try {
-                    const saved = localStorage.getItem('poe_auth');
-                    if (saved) {
-                        currentUser = JSON.parse(saved);
-                    }
-                } catch (e) {}
-
-                if (currentUser && currentUser.token) {
-                    enterMainApp();
-                } else {
-                    authPanel.style.display = 'block';
-                    mainContent.style.display = 'none';
-                }
+                // 单密码模式：不恢复登录状态，刷新后需重新输入密码
+                authPanel.style.display = 'block';
+                mainContent.style.display = 'none';
             }
 
             init();

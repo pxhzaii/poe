@@ -1,9 +1,7 @@
 // Pages Function: /api/data
-// 词缀数据读写（需 Bearer Token 鉴权，按用户隔离）
-//   GET  → 拉取当前用户的词缀
-//   POST → 覆盖推送当前用户的词缀
-
-const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+// 词缀数据读写（单密码模式，密码比对环境变量 APP_PASSWORD）
+//   GET  → 拉取词缀数据
+//   POST → 覆盖推送词缀数据
 
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -12,50 +10,41 @@ function jsonResponse(data, status = 200) {
       'Content-Type': 'application/json; charset=utf-8',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Password',
       'Access-Control-Max-Age': '86400',
     },
   });
 }
 
-async function authenticate(request, env) {
-  const auth = request.headers.get('Authorization') || '';
-  if (!auth.startsWith('Bearer ')) {
-    return { ok: false, error: '未授权：Token 缺失' };
+function authenticate(request, env) {
+  const password = request.headers.get('X-Sync-Password') || '';
+  const appPassword = env.APP_PASSWORD || '';
+  if (!appPassword) {
+    return { ok: false, error: '服务端未配置密码，请联系管理员' };
   }
-  const token = auth.slice(7);
-  const kv = env.AFFIX_KV;
-  if (!kv) {
-    return { ok: false, error: 'KV 未绑定，请联系管理员' };
+  if (!password || password !== appPassword) {
+    return { ok: false, error: '密码错误' };
   }
-  const tokenRaw = await kv.get('token:' + token);
-  if (!tokenRaw) {
-    return { ok: false, error: '未授权：Token 无效或已过期' };
-  }
-  try {
-    const tokenData = JSON.parse(tokenRaw);
-    if (tokenData.expires && Date.now() > tokenData.expires) {
-      await kv.delete('token:' + token);
-      return { ok: false, error: 'Token 已过期，请重新登录' };
-    }
-    return { ok: true, username: tokenData.username };
-  } catch (e) {
-    return { ok: false, error: 'Token 解析失败' };
-  }
+  return { ok: true };
 }
+
+const DATA_KEY = 'data:affixes';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
 
-  const authResult = await authenticate(request, env);
+  const authResult = authenticate(request, env);
   if (!authResult.ok) {
     return jsonResponse({ error: authResult.error }, 401);
   }
 
   const kv = env.AFFIX_KV;
-  const raw = await kv.get('data:' + authResult.username);
+  if (!kv) {
+    return jsonResponse({ error: 'KV 未绑定，请联系管理员' }, 500);
+  }
+  const raw = await kv.get(DATA_KEY);
   if (!raw) {
-    return jsonResponse({ affixes: [], updated_at: null });
+    return jsonResponse({ affixes: [], categories: [], updated_at: null });
   }
   try {
     const data = JSON.parse(raw);
@@ -72,7 +61,7 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  const authResult = await authenticate(request, env);
+  const authResult = authenticate(request, env);
   if (!authResult.ok) {
     return jsonResponse({ error: authResult.error }, 401);
   }
@@ -89,12 +78,15 @@ export async function onRequestPost(context) {
   }
 
   const kv = env.AFFIX_KV;
+  if (!kv) {
+    return jsonResponse({ error: 'KV 未绑定，请联系管理员' }, 500);
+  }
   const data = {
     affixes: body.affixes,
     categories: Array.isArray(body.categories) ? body.categories : [],
     updated_at: new Date().toISOString(),
   };
-  await kv.put('data:' + authResult.username, JSON.stringify(data));
+  await kv.put(DATA_KEY, JSON.stringify(data));
 
   return jsonResponse({ ok: true, updated_at: data.updated_at, count: data.affixes.length });
 }
@@ -105,7 +97,7 @@ export async function onRequestOptions() {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Password',
       'Access-Control-Max-Age': '86400',
     },
   });
