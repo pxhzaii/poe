@@ -100,163 +100,38 @@
             color: #c04848;
         }
 
-        /* ========== 登录面板 ========== */
-        .auth-panel {
-            background: #ffffff;
-            border: 1px solid #dce3ec;
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 1.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            max-width: 420px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .auth-panel h2 {
-            font-size: 1.15rem;
-            font-weight: 500;
-            color: #2c3e50;
-            margin-bottom: 0.4rem;
-            text-align: center;
-        }
-
-        .auth-panel .auth-sub {
-            font-size: 0.82rem;
-            color: #8a96a8;
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .auth-form-group {
-            margin-bottom: 1rem;
-        }
-
-        .auth-form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: #8a96a8;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.35rem;
-        }
-
-        .auth-form-group input {
-            width: 100%;
-            background: #f8fafc;
-            border: 1px solid #d0d9e6;
-            color: #2c3e50;
-            padding: 0.6rem 0.9rem;
-            border-radius: 30px;
-            font-size: 0.92rem;
-            outline: none;
-            transition: border-color 0.12s;
-        }
-
-        .auth-form-group input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
-        }
-
-        .auth-actions {
-            display: flex;
-            gap: 0.6rem;
-        }
-
-        .auth-actions .btn {
-            flex: 1;
-            justify-content: center;
-            padding: 0.6rem 1rem;
-        }
-
-        .auth-hint {
-            margin-top: 0.9rem;
-            font-size: 0.75rem;
-            color: #a0afc0;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        .auth-toggle-line {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .auth-toggle-line button {
-            background: none;
-            border: none;
-            color: #2563eb;
-            cursor: pointer;
-            font-size: 0.82rem;
-            padding: 0.2rem;
-        }
-
-        .auth-toggle-line button:hover {
-            text-decoration: underline;
-        }
-
-        .auth-error {
-            background: #fef0f0;
-            border: 1px solid #f0b8b8;
-            color: #c04848;
-            padding: 0.5rem 0.9rem;
-            border-radius: 10px;
-            font-size: 0.82rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .auth-error.show { display: block; }
-
-        /* ========== 密码弹窗 ========== */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
+        /* ========== 云同步条 ========== */
+        .sync-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 9999;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 16px;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .modal-box {
-            background: #fff;
-            border-radius: 18px;
-            padding: 1.8rem 2rem;
-            width: 90%;
-            max-width: 360px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-        }
-        .modal-box h3 {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        .modal-box input {
-            width: 100%;
+        .sync-bar input[type="password"] {
+            flex: 1;
+            min-width: 140px;
+            max-width: 260px;
             background: #f8fafc;
             border: 1px solid #d0d9e6;
             color: #2c3e50;
-            padding: 0.6rem 0.9rem;
+            padding: 0.5rem 0.9rem;
             border-radius: 30px;
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             outline: none;
             transition: border-color 0.12s;
-            margin-bottom: 0.4rem;
         }
-        .modal-box input:focus {
+        .sync-bar input[type="password"]:focus {
             border-color: #2563eb;
             box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
         }
-        .modal-actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.8rem;
-        }
-        .modal-actions .btn {
-            flex: 1;
-            justify-content: center;
-            padding: 0.6rem 1rem;
+        .sync-bar .btn {
+            flex-shrink: 0;
         }
 
         /* 快速添加按钮 */
@@ -731,22 +606,15 @@
             </div>
         </div>
 
-        <!-- 密码弹窗（推送/拉取时弹出） -->
-        <div class="modal-overlay" id="passwordModal" style="display:none;">
-            <div class="modal-box">
-                <h3 id="passwordModalTitle">☁️ 云端同步</h3>
-                <div class="auth-error" id="authError"></div>
-                <input type="password" id="authPassword" placeholder="输入云端同步密码" autocomplete="current-password">
-                <div class="modal-actions">
-                    <button class="btn" id="cancelPasswordBtn">取消</button>
-                    <button class="btn btn-primary" id="confirmPasswordBtn">确认</button>
-                </div>
-            </div>
+        <!-- 密码输入 + 云同步按钮 -->
+        <div class="sync-bar" id="syncBar">
+            <input type="password" id="syncPassword" placeholder="云端同步密码" autocomplete="current-password">
+            <button class="btn btn-primary" id="pushBtn">☁️ 备份</button>
+            <button class="btn" id="pullBtn">⬇️ 恢复</button>
         </div>
 
-
-        <!-- 主内容区（未登录或未选择本地模式前隐藏） -->
-        <div id="mainContent" style="display:none;">
+        <!-- 主内容区 -->
+        <div id="mainContent">
         <!-- 一级分类导航 -->
         <div class="cat-nav" id="catNav"></div>
 
@@ -771,7 +639,7 @@
 
         <!-- 底部 -->
         <div class="footer-note">
-                <span id="footerText">名称点击复制 · 选分类后在添加栏输入词缀回车/点按钮即可 · ✏️行内编辑 · 推送/拉取时需输入密码</span>
+                <span id="footerText">名称点击复制 · 选分类后在添加栏输入词缀回车/点按钮即可 · ✏️行内编辑 · 双击分类名可重命名</span>
         </div>
         </div>
     </div>
@@ -797,7 +665,11 @@
             let currentSub = '__all__';    // 当前二级分类
             let editingId = null;
             let syncing = false;
-            let cloudPassword = null;     // 云端同步密码（不保存到 localStorage）
+            let cloudPassword = null;     // 云端同步密码
+            const PWD_KEY = 'poe_sync_password';
+            const syncPasswordInput = document.getElementById('syncPassword');
+            const pushBtn = document.getElementById('pushBtn');
+            const pullBtn = document.getElementById('pullBtn');
 
             // ========== DOM ==========
             const grid = document.getElementById('affixGrid');
@@ -813,11 +685,6 @@
             const importBtn = document.getElementById('importBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
             const mainContent = document.getElementById('mainContent');
-            const authError = document.getElementById('authError');
-            const authPassword = document.getElementById('authPassword');
-            const passwordModal = document.getElementById('passwordModal');
-            const confirmPasswordBtn = document.getElementById('confirmPasswordBtn');
-            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
             const quickAddBtn = document.getElementById('quickAddBtn');
 
             // ========== 工具 ==========
@@ -967,101 +834,21 @@
                 return data;
             }
 
-            function showAuthError(msg) {
-                authError.textContent = msg;
-                authError.classList.add('show');
+            function getCloudPassword() {
+                const pwd = syncPasswordInput.value;
+                if (pwd) cloudPassword = pwd;
+                return cloudPassword;
             }
 
-            function hideAuthError() {
-                authError.classList.remove('show');
-            }
-
-            // 弹出密码框，用户输入密码后回调
-            function askPassword(title, callback) {
-                document.getElementById('passwordModalTitle').textContent = title;
-                authPassword.value = '';
-                hideAuthError();
-                passwordModal.style.display = 'flex';
-                authPassword.focus();
-                // 存储回调
-                passwordModal._callback = callback;
-            }
-
-            function closePasswordModal() {
-                passwordModal.style.display = 'none';
-                passwordModal._callback = null;
-            }
-
-            async function confirmPassword() {
-                const password = authPassword.value;
-                if (!password) {
-                    showAuthError('请输入密码');
-                    return;
+            function saveCloudPassword() {
+                const pwd = syncPasswordInput.value;
+                if (pwd) {
+                    cloudPassword = pwd;
+                    localStorage.setItem(PWD_KEY, pwd);
+                } else {
+                    cloudPassword = null;
+                    localStorage.removeItem(PWD_KEY);
                 }
-                // 验证密码
-                confirmPasswordBtn.disabled = true;
-                confirmPasswordBtn.textContent = '⏳ 验证中…';
-                try {
-                    await apiRequest('GET', '/api/data', undefined, password);
-                    // 密码正确
-                    cloudPassword = password;
-                    const cb = passwordModal._callback;
-                    closePasswordModal();
-                    if (cb) cb();
-                    updateHeaderForUser();
-                } catch (err) {
-                    if (err.status === 401) {
-                        showAuthError('密码错误');
-                    } else {
-                        showAuthError(err.message);
-                    }
-                } finally {
-                    confirmPasswordBtn.disabled = false;
-                    confirmPasswordBtn.textContent = '确认';
-                }
-            }
-
-            function updateHeaderForUser() {
-                // 在头部显示推送/拉取按钮
-                let userArea = document.getElementById('userArea');
-                if (!userArea) {
-                    userArea = document.createElement('div');
-                    userArea.id = 'userArea';
-                    userArea.style.cssText = 'display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;';
-                    document.querySelector('.header-actions').prepend(userArea);
-                }
-                userArea.innerHTML = '';
-                if (cloudPassword) {
-                    const cloudTag = document.createElement('span');
-                    cloudTag.textContent = '☁️ 已连接云端';
-                    cloudTag.style.cssText = 'font-size:0.85rem;color:#2563eb;padding:0.3rem 0.7rem;background:#eef5ff;border-radius:20px;border:1px solid #c6dcff;';
-                    userArea.appendChild(cloudTag);
-                }
-
-                const pushBtn = document.createElement('button');
-                pushBtn.className = 'btn';
-                pushBtn.textContent = '☁️ 推送';
-                pushBtn.addEventListener('click', pushCloud);
-                userArea.appendChild(pushBtn);
-
-                const pullBtn = document.createElement('button');
-                pullBtn.className = 'btn';
-                pullBtn.textContent = '⬇️ 拉取';
-                pullBtn.addEventListener('click', pullCloud);
-                userArea.appendChild(pullBtn);
-
-                if (cloudPassword) {
-                    const clearBtn = document.createElement('button');
-                    clearBtn.className = 'btn';
-                    clearBtn.textContent = '🔒 清除密码';
-                    clearBtn.addEventListener('click', doLogout);
-                    userArea.appendChild(clearBtn);
-                }
-            }
-
-            function doLogout() {
-                cloudPassword = null;
-                updateHeaderForUser();
             }
 
             // 静默推送云端（不加确认弹窗，删除/添加等操作后自动同步）
@@ -1070,56 +857,62 @@
                 try {
                     await apiRequest('POST', '/api/data', { affixes, categories });
                 } catch (e) {
-                    // 静默失败，不干扰用户
+                    // 静默失败
                 }
             }
 
             async function pushCloud() {
                 if (syncing) return;
-                if (!cloudPassword) {
-                    askPassword('☁️ 推送云端 — 请输入密码', () => pushCloud());
-                    return;
-                }
-                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端，会覆盖云端旧数据。继续？`)) return;
+                const pwd = getCloudPassword();
+                if (!pwd) { alert('请先输入密码'); return; }
+                if (!confirm(`将当前 ${affixes.length} 条词缀备份到云端，会覆盖云端旧数据。继续？`)) return;
                 syncing = true;
+                pushBtn.disabled = true;
+                pushBtn.textContent = '⏳ 备份中…';
                 try {
-                    await apiRequest('POST', '/api/data', { affixes, categories });
-                    showToast('已推送 ' + affixes.length + ' 条到云端', '☁️');
+                    await apiRequest('POST', '/api/data', { affixes, categories }, pwd);
+                    saveCloudPassword();
+                    showToast('已备份 ' + affixes.length + ' 条到云端', '☁️');
                 } catch (err) {
-                    alert('推送失败：' + err.message);
+                    alert('备份失败：' + err.message);
                 } finally {
                     syncing = false;
+                    pushBtn.disabled = false;
+                    pushBtn.textContent = '☁️ 备份';
                 }
             }
 
             async function pullCloud() {
                 if (syncing) return;
-                if (!cloudPassword) {
-                    askPassword('⬇️ 拉取云端 — 请输入密码', () => pullCloud());
-                    return;
-                }
+                const pwd = getCloudPassword();
+                if (!pwd) { alert('请先输入密码'); return; }
                 syncing = true;
+                pullBtn.disabled = true;
+                pullBtn.textContent = '⏳ 恢复中…';
                 try {
-                    const res = await apiRequest('GET', '/api/data');
+                    const res = await apiRequest('GET', '/api/data', undefined, pwd);
                     const remote = (res && Array.isArray(res.affixes)) ? res.affixes : [];
                     const remoteCats = (res && Array.isArray(res.categories)) ? res.categories : [];
                     const when = res && res.updated_at ? res.updated_at.slice(0, 19).replace('T', ' ') : '';
                     if (remote.length === 0 && remoteCats.length === 0) {
                         alert('云端没有数据');
                     } else {
-                        if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），拉取将用云端数据覆盖本地。继续？`)) {
+                        if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），恢复将用云端数据覆盖本地。继续？`)) {
                             return;
                         }
+                        saveCloudPassword();
                         affixes = remote;
                         categories = remoteCats;
                         saveToStorage();
                         render();
-                        showToast('已拉取 ' + remote.length + ' 条词缀' + (when ? '（' + when + '）' : ''), '⬇️');
+                        showToast('已恢复 ' + remote.length + ' 条词缀' + (when ? '（' + when + '）' : ''), '⬇️');
                     }
                 } catch (err) {
-                    alert('拉取失败：' + err.message);
+                    alert('恢复失败：' + err.message);
                 } finally {
                     syncing = false;
+                    pullBtn.disabled = false;
+                    pullBtn.textContent = '⬇️ 恢复';
                 }
             }
 
@@ -1695,13 +1488,13 @@
                     render();
                 });
 
-                // 密码弹窗
-                confirmPasswordBtn.addEventListener('click', confirmPassword);
-                cancelPasswordBtn.addEventListener('click', closePasswordModal);
-                authPassword.addEventListener('keydown', (e) => {
+                // 云同步
+                pushBtn.addEventListener('click', pushCloud);
+                pullBtn.addEventListener('click', pullCloud);
+                syncPasswordInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        confirmPassword();
+                        pushCloud();
                     }
                 });
 
@@ -1719,9 +1512,15 @@
                 loadFromStorage();
                 bindEvents();
 
-                // 打开页面直接进入主界面（本地模式）
-                mainContent.style.display = 'block';
-                updateHeaderForUser();
+                // 恢复密码
+                try {
+                    const saved = localStorage.getItem(PWD_KEY);
+                    if (saved) {
+                        syncPasswordInput.value = saved;
+                        cloudPassword = saved;
+                    }
+                } catch (e) {}
+
                 render();
             }
 
