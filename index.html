@@ -851,16 +851,6 @@
                 }
             }
 
-            // 静默推送云端（不加确认弹窗，删除/添加等操作后自动同步）
-            async function syncToCloud() {
-                if (!cloudPassword || syncing) return;
-                try {
-                    await apiRequest('POST', '/api/data', { affixes, categories });
-                } catch (e) {
-                    // 静默失败
-                }
-            }
-
             async function pushCloud() {
                 if (syncing) return;
                 const pwd = getCloudPassword();
@@ -983,7 +973,6 @@
                         currentCat = name;
                         currentSub = '__all__';
                         render();
-                        syncToCloud();
                     }
                 });
                 catNav.appendChild(addBtn);
@@ -1010,7 +999,6 @@
                             ensureCategory(currentCat, name);
                             currentSub = name;
                             render();
-                            syncToCloud();
                         }
                     });
                     subcatRow.appendChild(addBtn);
@@ -1052,7 +1040,6 @@
                         ensureCategory(currentCat, name);
                         currentSub = name;
                         render();
-                        syncToCloud();
                     }
                 });
                 subcatRow.appendChild(addBtn);
@@ -1261,7 +1248,6 @@
                 saveToStorage();
                 render();
                 showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
-                syncToCloud();
             }
 
             function renameSubcategory(catName, oldName) {
@@ -1287,7 +1273,6 @@
                     saveToStorage();
                     render();
                     showToast(`已把「${oldName}」合并到「${trimmed}」`, '✏️');
-                    syncToCloud();
                     return;
                 }
                 let n = 0;
@@ -1302,7 +1287,6 @@
                 saveToStorage();
                 render();
                 showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
-                syncToCloud();
             }
 
             // ========== 快速添加 / 行内编辑 ==========
@@ -1325,7 +1309,6 @@
                 quickAddInput.value = '';
                 quickAddInput.focus();
                 render();
-                syncToCloud();
             }
 
             let inlineEditingId = null;
@@ -1354,12 +1337,10 @@
                     if (confirm('名称为空，是否删除该词缀？')) {
                         affixes = affixes.filter(a => a.id !== id);
                         saveToStorage();
-                        syncToCloud();
                     }
                 } else {
                     item.name = trimmed;
                     saveToStorage();
-                    syncToCloud();
                 }
                 inlineEditingId = null;
                 render();
@@ -1378,7 +1359,6 @@
                 saveToStorage();
                 render();
                 if (inlineEditingId === id) inlineEditingId = null;
-                syncToCloud();
             }
 
             function clearAll() {
@@ -1392,7 +1372,6 @@
                 categories = [];
                 saveToStorage();
                 render();
-                syncToCloud();
             }
 
             function exportData() {
@@ -1445,7 +1424,6 @@
                             saveToStorage();
                             render();
                             showToast(`成功导入 ${valid.length} 条`, '📥');
-                            syncToCloud();
                         } catch (err) {
                             alert('解析文件失败：' + err.message);
                         }
