@@ -978,28 +978,7 @@
                 hideAuthError();
                 authPanel.style.display = 'none';
                 mainContent.style.display = 'block';
-                if (currentUser && currentUser.token) {
-                    // 已登录：自动拉取云端数据
-                    try {
-                        const res = await apiRequest('GET', '/api/data');
-                        if (res && Array.isArray(res.affixes)) {
-                            const localCount = affixes.length;
-                            if (res.affixes.length > 0 || (res.categories && res.categories.length > 0)) {
-                                // 云端有数据 → 覆盖本地
-                                if (localCount === 0 || confirm(`云端有 ${res.affixes.length} 条词缀（本地 ${localCount} 条）。
-点击「确定」用云端数据覆盖本地，点击「取消」保留本地数据。`)) {
-                                    affixes = res.affixes;
-                                    if (Array.isArray(res.categories)) {
-                                        categories = res.categories;
-                                    }
-                                    saveToStorage();
-                                }
-                            }
-                        }
-                    } catch (err) {
-                        showToast('云端数据拉取失败：' + err.message, '⚠️');
-                    }
-                }
+                // 不自动拉取云端数据，用户可通过「⬇️ 拉取云端」手动恢复
                 updateHeaderForUser();
                 render();
             }
@@ -1097,7 +1076,9 @@
                     if (remote.length === 0 && remoteCats.length === 0) {
                         alert('云端没有数据');
                     } else {
-                        if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），拉取将用云端数据覆盖本地。继续？`)) return;
+                        if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），拉取将用云端数据覆盖本地。继续？`)) {
+                            return;
+                        }
                         affixes = remote;
                         categories = remoteCats;
                         saveToStorage();
@@ -1432,6 +1413,7 @@
             }
 
             function renameCategory(oldName) {
+                if (!oldName || oldName === '__all__') return;
                 const newName = prompt('修改一级分类名称：', oldName);
                 if (newName === null) return;
                 const trimmed = newName.trim();
@@ -1460,6 +1442,7 @@
             }
 
             function renameSubcategory(catName, oldName) {
+                if (!catName || catName === '__all__' || !oldName) return;
                 const newName = prompt(`修改「${catName}」下分类名称：`, oldName);
                 if (newName === null) return;
                 const trimmed = newName.trim();
@@ -1632,9 +1615,14 @@
                             }
                             if (!confirm(`即将导入 ${valid.length} 条词缀。\n当前已有 ${affixes.length} 条。是否继续？`)) return;
                             affixes = affixes.concat(valid);
+                            // 同步导入的分类到独立 categories 结构
+                            valid.forEach(item => {
+                                ensureCategory(item.category, item.subcategory || null);
+                            });
                             saveToStorage();
                             render();
                             showToast(`成功导入 ${valid.length} 条`, '📥');
+                            syncToCloud();
                         } catch (err) {
                             alert('解析文件失败：' + err.message);
                         }
