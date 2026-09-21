@@ -331,6 +331,17 @@
             color: #16a34a;
         }
 
+        .cat-rename {
+            font-size: 0.66rem;
+            margin-left: 0.35rem;
+            opacity: 0.45;
+            cursor: pointer;
+            display: inline-block;
+            vertical-align: middle;
+            transition: opacity 0.1s;
+        }
+        .cat-rename:hover { opacity: 1; }
+
         /* 二级分类行 */
         .subcat-row {
             display: flex;
@@ -366,6 +377,10 @@
         .subcat-btn.active {
             background: #2563eb;
             color: #ffffff;
+        }
+
+        .subcat-btn.active .cat-rename {
+            opacity: 0.85;
         }
 
         .subcat-btn.subcat-add {
@@ -1061,7 +1076,7 @@
                     const btn = document.createElement('button');
                     btn.className = 'cat-btn' + (currentCat === cat ? ' active' : '');
                     btn.dataset.cat = cat;
-                    btn.innerHTML = escapeHtml(cat) + ' <span class="cat-count">' + count + '</span>';
+                    btn.innerHTML = escapeHtml(cat) + '<span class="cat-rename" title="重命名分类">✏️</span> <span class="cat-count">' + count + '</span>';
                     catNav.appendChild(btn);
                 });
 
@@ -1089,12 +1104,12 @@
                 if (currentSub !== '__all__') allSubs.add(currentSub);
 
                 if (allSubs.size === 0) {
-                    // 没有二级分类，也显示一个"+ 分组"按钮
+                    // 没有二级分类，也显示一个"+ 分类"按钮
                     const addBtn = document.createElement('button');
                     addBtn.className = 'subcat-btn subcat-add';
-                    addBtn.textContent = '+ 分组';
+                    addBtn.textContent = '+ 分类';
                     addBtn.addEventListener('click', () => {
-                        const newSub = prompt(`在「${currentCat}」下新建二级分类/分组名称：`);
+                        const newSub = prompt(`在「${currentCat}」下新建分类名称：`);
                         if (newSub && newSub.trim()) {
                             currentSub = newSub.trim();
                             render();
@@ -1106,7 +1121,7 @@
 
                 const label = document.createElement('span');
                 label.className = 'subcat-label';
-                label.textContent = '分组：';
+                label.textContent = '分类：';
                 subcatRow.appendChild(label);
 
                 const allBtn = document.createElement('button');
@@ -1121,14 +1136,15 @@
                     btn.className = 'subcat-btn' + (currentSub === sub ? ' active' : '');
                     btn.dataset.sub = sub;
                     btn.textContent = sub + ' (' + count + ')';
+                    btn.appendChild(buildRenameIcon('rename-sub', sub));
                     subcatRow.appendChild(btn);
                 });
 
                 const addBtn = document.createElement('button');
                 addBtn.className = 'subcat-btn subcat-add';
-                addBtn.textContent = '+ 分组';
+                addBtn.textContent = '+ 分类';
                 addBtn.addEventListener('click', () => {
-                    const newSub = prompt(`在「${currentCat}」下新建二级分类/分组名称：`);
+                    const newSub = prompt(`在「${currentCat}」下新建分类名称：`);
                     if (newSub && newSub.trim()) {
                         currentSub = newSub.trim();
                         render();
@@ -1186,7 +1202,7 @@
                     return;
                 }
 
-                // 按 (category, subcategory) 分组
+                // 按 (category, subcategory) 分类归卡片
                 const groups = {};
                 const groupOrder = [];
                 filtered.forEach(item => {
@@ -1311,6 +1327,78 @@
                 });
 
                 return row;
+            }
+
+            // ========== 分类重命名 ==========
+            function buildRenameIcon(kind, name) {
+                const icon = document.createElement('span');
+                icon.className = 'cat-rename';
+                icon.title = '重命名分类';
+                icon.textContent = '✏️';
+                icon.dataset.renameKind = kind;
+                icon.dataset.renameName = name;
+                return icon;
+            }
+
+            function renameCategory(oldName) {
+                const newName = prompt('修改一级分类名称：', oldName);
+                if (newName === null) return;
+                const trimmed = newName.trim();
+                if (!trimmed) {
+                    showToast('分类名不能为空', '⚠️');
+                    return;
+                }
+                if (trimmed === oldName) return;
+                if (getAllCategories().has(trimmed)) {
+                    alert('已存在同名一级分类：' + trimmed);
+                    return;
+                }
+                let n = 0;
+                affixes.forEach(a => {
+                    if ((a.category || '未分类') === oldName) {
+                        a.category = trimmed;
+                        n++;
+                    }
+                });
+                if (currentCat === oldName) currentCat = trimmed;
+                saveToStorage();
+                render();
+                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
+            }
+
+            function renameSubcategory(catName, oldName) {
+                const newName = prompt(`修改「${catName}」下分类名称：`, oldName);
+                if (newName === null) return;
+                const trimmed = newName.trim();
+                if (!trimmed) {
+                    showToast('分类名不能为空', '⚠️');
+                    return;
+                }
+                if (trimmed === oldName) return;
+                if (getSubcategoryList(catName).includes(trimmed)) {
+                    if (!confirm(`「${catName}」下已存在同名分类「${trimmed}」。\n点击「确定」把「${oldName}」的词缀合并到「${trimmed}」，点击「取消」放弃改名。`)) return;
+                    // 合并同名分类：把旧词缀归并到新名下
+                    affixes.forEach(a => {
+                        if ((a.category || '未分类') === catName && (a.subcategory || '') === oldName) {
+                            a.subcategory = trimmed;
+                        }
+                    });
+                    saveToStorage();
+                    render();
+                    showToast(`已把「${oldName}」合并到「${trimmed}」`, '✏️');
+                    return;
+                }
+                let n = 0;
+                affixes.forEach(a => {
+                    if ((a.category || '未分类') === catName && (a.subcategory || '') === oldName) {
+                        a.subcategory = trimmed;
+                        n++;
+                    }
+                });
+                if (currentCat === catName && currentSub === oldName) currentSub = trimmed;
+                saveToStorage();
+                render();
+                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
             }
 
             // ========== 快速添加 / 行内编辑 ==========
@@ -1466,6 +1554,15 @@
 
                 // 一级分类点击
                 catNav.addEventListener('click', (e) => {
+                    const renameIcon = e.target.closest('.cat-rename');
+                    if (renameIcon) {
+                        const btn = renameIcon.closest('.cat-btn');
+                        if (btn && btn.dataset.cat) {
+                            e.stopPropagation();
+                            renameCategory(btn.dataset.cat);
+                        }
+                        return;
+                    }
                     const btn = e.target.closest('.cat-btn');
                     if (!btn) return;
                     if (btn.dataset.cat === undefined) return;
@@ -1476,6 +1573,15 @@
 
                 // 二级分类点击
                 subcatRow.addEventListener('click', (e) => {
+                    const renameIcon = e.target.closest('.cat-rename');
+                    if (renameIcon) {
+                        const btn = renameIcon.closest('.subcat-btn');
+                        if (btn && btn.dataset.sub) {
+                            e.stopPropagation();
+                            renameSubcategory(currentCat, btn.dataset.sub);
+                        }
+                        return;
+                    }
                     const btn = e.target.closest('.subcat-btn');
                     if (!btn) return;
                     if (btn.dataset.sub === undefined) return;

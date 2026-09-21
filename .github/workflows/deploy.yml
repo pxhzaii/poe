@@ -104,8 +104,8 @@ jobs:
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe.5as.cn" || true
           echo "--- GET /api/data without token (expect 401) ---"
           curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe.5as.cn/api/data" || true
-          echo "--- Register smoke test (may 409 if exists) ---"
+          echo "--- POST /api/register with invalid body (expect 400, no DB pollution) ---"
           curl -sS -m 30 -X POST "https://poe.5as.cn/api/register" \
             -H "Content-Type: application/json" \
-            -d '{"username":"ci_smoke_test","password":"test1234"}' | head -c 200 || true
+            -d '{"username":"x","password":"1"}' | head -c 200 || true
           echo ""
