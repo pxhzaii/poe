@@ -61,6 +61,7 @@ export async function onRequestGet(context) {
     const data = JSON.parse(raw);
     return jsonResponse({
       affixes: Array.isArray(data.affixes) ? data.affixes : [],
+      categories: Array.isArray(data.categories) ? data.categories : [],
       updated_at: data.updated_at || null,
     });
   } catch (e) {
@@ -90,6 +91,7 @@ export async function onRequestPost(context) {
   const kv = env.AFFIX_KV;
   const data = {
     affixes: body.affixes,
+    categories: Array.isArray(body.categories) ? body.categories : [],
     updated_at: new Date().toISOString(),
   };
   await kv.put('data:' + authResult.username, JSON.stringify(data));

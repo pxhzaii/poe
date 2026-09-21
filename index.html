@@ -735,6 +735,7 @@
         (function() {
             // ========== 配置 ==========
             const STORAGE_KEY = 'poe_my_affixes_v2';
+            const CAT_STORAGE_KEY = 'poe_my_categories_v1';
             // 同域 API：线上版走 poe.5as.cn/api（国内可访问）；
             // 本地双击打开时用线上 API 地址，保证注册/登录可用
             const API_BASE = (location.protocol === 'http:' || location.protocol === 'https:')
@@ -743,6 +744,7 @@
 
             // ========== 状态 ==========
             let affixes = [];              // [{id, category, subcategory, name}]
+            let categories = [];           // [{cat, subs:[]}]  独立存储的分类结构
             let currentCat = '__all__';     // 当前一级分类
             let currentSub = '__all__';    // 当前二级分类
             let editingId = null;
@@ -820,19 +822,77 @@
                         const parsed = JSON.parse(raw);
                         if (Array.isArray(parsed)) {
                             affixes = parsed;
-                            return;
                         }
                     }
                 } catch (e) {}
-                affixes = [];
+                try {
+                    const catRaw = localStorage.getItem(CAT_STORAGE_KEY);
+                    if (catRaw) {
+                        const parsed = JSON.parse(catRaw);
+                        if (Array.isArray(parsed)) {
+                            categories = parsed;
+                        }
+                    }
+                } catch (e) {}
+                if (!affixes) affixes = [];
+                if (!categories) categories = [];
                 saveToStorage();
             }
 
             function saveToStorage() {
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(affixes));
+                    localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(categories));
                 } catch (e) {
                     alert('保存失败，可能是浏览器存储空间不足或被禁用。');
+                }
+            }
+
+            // ========== 分类管理 ==========
+            function ensureCategory(catName, subName) {
+                let entry = categories.find(c => c.cat === catName);
+                if (!entry) {
+                    entry = { cat: catName, subs: [] };
+                    categories.push(entry);
+                }
+                if (subName && subName.trim() && !entry.subs.includes(subName.trim())) {
+                    entry.subs.push(subName.trim());
+                }
+                saveToStorage();
+            }
+
+            function removeSubFromCategory(catName, subName) {
+                const entry = categories.find(c => c.cat === catName);
+                if (entry) {
+                    entry.subs = entry.subs.filter(s => s !== subName);
+                    saveToStorage();
+                }
+            }
+
+            function removeCategoryEntry(catName) {
+                categories = categories.filter(c => c.cat !== catName);
+                saveToStorage();
+            }
+
+            function renameCategoryEntry(oldName, newName) {
+                const entry = categories.find(c => c.cat === oldName);
+                if (entry) {
+                    entry.cat = newName;
+                } else {
+                    categories.push({ cat: newName, subs: [] });
+                }
+                saveToStorage();
+            }
+
+            function renameSubEntry(catName, oldSub, newSub) {
+                const entry = categories.find(c => c.cat === catName);
+                if (entry) {
+                    if (!entry.subs.includes(newSub)) {
+                        entry.subs = entry.subs.map(s => s === oldSub ? newSub : s);
+                    } else {
+                        entry.subs = entry.subs.filter(s => s !== oldSub);
+                    }
+                    saveToStorage();
                 }
             }
 
@@ -924,10 +984,14 @@
                         const res = await apiRequest('GET', '/api/data');
                         if (res && Array.isArray(res.affixes)) {
                             const localCount = affixes.length;
-                            if (res.affixes.length > 0) {
+                            if (res.affixes.length > 0 || (res.categories && res.categories.length > 0)) {
                                 // 云端有数据 → 覆盖本地
-                                if (localCount === 0 || confirm(`云端有 ${res.affixes.length} 条词缀（本地 ${localCount} 条）。\n点击「确定」用云端数据覆盖本地，点击「取消」保留本地数据。`)) {
+                                if (localCount === 0 || confirm(`云端有 ${res.affixes.length} 条词缀（本地 ${localCount} 条）。
+点击「确定」用云端数据覆盖本地，点击「取消」保留本地数据。`)) {
                                     affixes = res.affixes;
+                                    if (Array.isArray(res.categories)) {
+                                        categories = res.categories;
+                                    }
                                     saveToStorage();
                                 }
                             }
@@ -990,6 +1054,16 @@
                 updateHeaderForUser();
             }
 
+            // 静默推送云端（不加确认弹窗，删除/添加等操作后自动同步）
+            async function syncToCloud() {
+                if (!currentUser || !currentUser.token || syncing) return;
+                try {
+                    await apiRequest('POST', '/api/data', { affixes, categories });
+                } catch (e) {
+                    // 静默失败，不干扰用户
+                }
+            }
+
             async function pushCloud() {
                 if (syncing) return;
                 if (!currentUser || !currentUser.token) {
@@ -999,7 +1073,7 @@
                 if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端，会覆盖云端「${currentUser.username}」名下旧数据。继续？`)) return;
                 syncing = true;
                 try {
-                    await apiRequest('POST', '/api/data', { affixes });
+                    await apiRequest('POST', '/api/data', { affixes, categories });
                     showToast('已推送 ' + affixes.length + ' 条到云端', '☁️');
                 } catch (err) {
                     alert('推送失败：' + err.message);
@@ -1018,12 +1092,14 @@
                 try {
                     const res = await apiRequest('GET', '/api/data');
                     const remote = (res && Array.isArray(res.affixes)) ? res.affixes : [];
+                    const remoteCats = (res && Array.isArray(res.categories)) ? res.categories : [];
                     const when = res && res.updated_at ? res.updated_at.slice(0, 19).replace('T', ' ') : '';
-                    if (remote.length === 0) {
+                    if (remote.length === 0 && remoteCats.length === 0) {
                         alert('云端没有数据');
                     } else {
                         if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），拉取将用云端数据覆盖本地。继续？`)) return;
                         affixes = remote;
+                        categories = remoteCats;
                         saveToStorage();
                         render();
                         showToast('已拉取 ' + remote.length + ' 条词缀' + (when ? '（' + when + '）' : ''), '⬇️');
@@ -1038,6 +1114,12 @@
             // ========== 分类管理 ==========
             function getAllCategories() {
                 const map = new Map(); // category -> Set(subcategory)
+                // 从独立存储的分类结构中加载
+                categories.forEach(c => {
+                    if (!map.has(c.cat)) map.set(c.cat, new Set());
+                    c.subs.forEach(s => map.get(c.cat).add(s));
+                });
+                // 从词缀数据中补充（兼容旧数据）
                 affixes.forEach(item => {
                     const cat = (item.category && item.category.trim()) || '未分类';
                     const sub = (item.subcategory && item.subcategory.trim()) || '';
@@ -1086,9 +1168,12 @@
                 addBtn.addEventListener('click', () => {
                     const newCat = prompt('输入新的一级分类名称（如：衣服、鞋子、珠宝）：');
                     if (newCat && newCat.trim()) {
-                        currentCat = newCat.trim();
+                        const name = newCat.trim();
+                        ensureCategory(name, null);
+                        currentCat = name;
                         currentSub = '__all__';
                         render();
+                        syncToCloud();
                     }
                 });
                 catNav.appendChild(addBtn);
@@ -1111,8 +1196,11 @@
                     addBtn.addEventListener('click', () => {
                         const newSub = prompt(`在「${currentCat}」下新建分类名称：`);
                         if (newSub && newSub.trim()) {
-                            currentSub = newSub.trim();
+                            const name = newSub.trim();
+                            ensureCategory(currentCat, name);
+                            currentSub = name;
                             render();
+                            syncToCloud();
                         }
                     });
                     subcatRow.appendChild(addBtn);
@@ -1146,8 +1234,11 @@
                 addBtn.addEventListener('click', () => {
                     const newSub = prompt(`在「${currentCat}」下新建分类名称：`);
                     if (newSub && newSub.trim()) {
-                        currentSub = newSub.trim();
+                        const name = newSub.trim();
+                        ensureCategory(currentCat, name);
+                        currentSub = name;
                         render();
+                        syncToCloud();
                     }
                 });
                 subcatRow.appendChild(addBtn);
@@ -1360,10 +1451,12 @@
                         n++;
                     }
                 });
+                renameCategoryEntry(oldName, trimmed);
                 if (currentCat === oldName) currentCat = trimmed;
                 saveToStorage();
                 render();
                 showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
+                syncToCloud();
             }
 
             function renameSubcategory(catName, oldName) {
@@ -1376,16 +1469,19 @@
                 }
                 if (trimmed === oldName) return;
                 if (getSubcategoryList(catName).includes(trimmed)) {
-                    if (!confirm(`「${catName}」下已存在同名分类「${trimmed}」。\n点击「确定」把「${oldName}」的词缀合并到「${trimmed}」，点击「取消」放弃改名。`)) return;
+                    if (!confirm(`「${catName}」下已存在同名分类「${trimmed}」。
+点击「确定」把「${oldName}」的词缀合并到「${trimmed}」，点击「取消」放弃改名。`)) return;
                     // 合并同名分类：把旧词缀归并到新名下
                     affixes.forEach(a => {
                         if ((a.category || '未分类') === catName && (a.subcategory || '') === oldName) {
                             a.subcategory = trimmed;
                         }
                     });
+                    renameSubEntry(catName, oldName, trimmed);
                     saveToStorage();
                     render();
                     showToast(`已把「${oldName}」合并到「${trimmed}」`, '✏️');
+                    syncToCloud();
                     return;
                 }
                 let n = 0;
@@ -1395,10 +1491,12 @@
                         n++;
                     }
                 });
+                renameSubEntry(catName, oldName, trimmed);
                 if (currentCat === catName && currentSub === oldName) currentSub = trimmed;
                 saveToStorage();
                 render();
                 showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
+                syncToCloud();
             }
 
             // ========== 快速添加 / 行内编辑 ==========
@@ -1409,16 +1507,19 @@
                     alert('请先选择一级分类');
                     return;
                 }
+                const sub = currentSub === '__all__' ? '' : currentSub;
                 affixes.push({
                     id: generateId(),
                     category: currentCat,
-                    subcategory: currentSub === '__all__' ? '' : currentSub,
+                    subcategory: sub,
                     name
                 });
+                if (sub) ensureCategory(currentCat, sub);
                 saveToStorage();
                 quickAddInput.value = '';
                 quickAddInput.focus();
                 render();
+                syncToCloud();
             }
 
             let inlineEditingId = null;
@@ -1447,10 +1548,12 @@
                     if (confirm('名称为空，是否删除该词缀？')) {
                         affixes = affixes.filter(a => a.id !== id);
                         saveToStorage();
+                        syncToCloud();
                     }
                 } else {
                     item.name = trimmed;
                     saveToStorage();
+                    syncToCloud();
                 }
                 inlineEditingId = null;
                 render();
@@ -1469,18 +1572,21 @@
                 saveToStorage();
                 render();
                 if (inlineEditingId === id) inlineEditingId = null;
+                syncToCloud();
             }
 
             function clearAll() {
-                if (affixes.length === 0) {
+                if (affixes.length === 0 && categories.length === 0) {
                     alert('已经是空的了');
                     return;
                 }
-                if (!confirm(`确定要清空所有 ${affixes.length} 条词缀吗？此操作不可恢复！`)) return;
+                if (!confirm(`确定要清空所有 ${affixes.length} 条词缀和 ${categories.length} 个分类吗？此操作不可恢复！`)) return;
                 if (!confirm('再次确认：真的要全部删除吗？')) return;
                 affixes = [];
+                categories = [];
                 saveToStorage();
                 render();
+                syncToCloud();
             }
 
             function exportData() {
