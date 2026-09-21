@@ -141,78 +141,6 @@
             font-size: 0.88rem;
         }
 
-        /* 添加表单 */
-        .add-form {
-            background: #ffffff;
-            border: 1px solid #dce3ec;
-            border-radius: 16px;
-            padding: 1.2rem 1.2rem 1rem;
-            margin-bottom: 1.8rem;
-            display: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .add-form.show {
-            display: block;
-        }
-
-        .form-title {
-            font-size: 0.95rem;
-            color: #2563eb;
-            margin-bottom: 0.9rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            align-items: flex-end;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-            flex: 1 0 150px;
-        }
-
-        .form-group label {
-            font-size: 0.75rem;
-            color: #8a96a8;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .form-group input,
-        .form-group select {
-            background: #f8fafc;
-            border: 1px solid #d0d9e6;
-            color: #2c3e50;
-            padding: 0.55rem 0.9rem;
-            border-radius: 30px;
-            font-size: 0.92rem;
-            outline: none;
-            transition: border-color 0.12s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
-        }
-
-        .form-group input::placeholder {
-            color: #a0afc0;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 0.9rem;
-        }
-
         /* ========== 两级分类 ========== */
         .cat-nav {
             display: flex;
@@ -653,7 +581,7 @@
             const STORAGE_KEY = 'poe_my_affixes_v2';
             const CAT_STORAGE_KEY = 'poe_my_categories_v1';
             // 同域 API：线上版走 poe.5as.cn/api（国内可访问）；
-            // 本地双击打开时用线上 API 地址，保证注册/登录可用
+            // 本地双击打开时用线上 API 地址，保证云同步可用
             const API_BASE = (location.protocol === 'http:' || location.protocol === 'https:')
                 ? ''  // 同域
                 : 'https://poe.5as.cn';  // file:// 模式走线上 API
@@ -663,7 +591,6 @@
             let categories = [];           // [{cat, subs:[]}]  独立存储的分类结构
             let currentCat = '__all__';     // 当前一级分类
             let currentSub = '__all__';    // 当前二级分类
-            let editingId = null;
             let syncing = false;
             let cloudPassword = null;     // 云端同步密码
             const PWD_KEY = 'poe_sync_password';
@@ -684,7 +611,6 @@
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
-            const mainContent = document.getElementById('mainContent');
             const quickAddBtn = document.getElementById('quickAddBtn');
 
             // ========== 工具 ==========
@@ -1153,14 +1079,16 @@
                             input.addEventListener('keydown', (e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
+                                    blurHandled = true;
                                     commitInlineEdit(item.id, input.value);
                                 } else if (e.key === 'Escape') {
                                     e.preventDefault();
+                                    blurHandled = true;
                                     cancelInlineEdit();
                                 }
                             });
                             input.addEventListener('blur', () => {
-                                // 失焦时提交
+                                if (blurHandled) { blurHandled = false; return; }
                                 commitInlineEdit(item.id, input.value);
                             });
                             row.appendChild(input);
@@ -1329,9 +1257,11 @@
             }
 
             function commitInlineEdit(id, newName) {
+                if (inlineEditingId !== id) return; // 防止 blur 重复触发
                 const item = affixes.find(a => a.id === id);
-                if (!item) return;
+                if (!item) { inlineEditingId = null; return; }
                 const trimmed = newName.trim();
+                inlineEditingId = null;
                 if (!trimmed) {
                     // 空名称则删除
                     if (confirm('名称为空，是否删除该词缀？')) {
@@ -1342,7 +1272,6 @@
                     item.name = trimmed;
                     saveToStorage();
                 }
-                inlineEditingId = null;
                 render();
             }
 
@@ -1350,6 +1279,9 @@
                 inlineEditingId = null;
                 render();
             }
+
+            // 标记 blur 是否已被处理，防止 Enter/Escape 后 blur 重复触发
+            let blurHandled = false;
 
             function deleteAffix(id) {
                 const item = affixes.find(a => a.id === id);
@@ -1370,6 +1302,8 @@
                 if (!confirm('再次确认：真的要全部删除吗？')) return;
                 affixes = [];
                 categories = [];
+                currentCat = '__all__';
+                currentSub = '__all__';
                 saveToStorage();
                 render();
             }
