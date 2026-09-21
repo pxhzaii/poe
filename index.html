@@ -390,16 +390,17 @@
             color: #16a34a;
         }
 
-        .cat-rename {
-            font-size: 0.66rem;
-            margin-left: 0.35rem;
-            opacity: 0.45;
-            cursor: pointer;
-            display: inline-block;
-            vertical-align: middle;
-            transition: opacity 0.1s;
+        .cat-rename-hint {
+            font-size: 0.62rem;
+            color: #a0afc0;
+            margin-left: 0.3rem;
+            display: none;
+            white-space: nowrap;
         }
-        .cat-rename:hover { opacity: 1; }
+        .cat-btn:hover .cat-rename-hint,
+        .subcat-btn:hover .cat-rename-hint {
+            display: inline;
+        }
 
         /* 二级分类行 */
         .subcat-row {
@@ -438,8 +439,8 @@
             color: #ffffff;
         }
 
-        .subcat-btn.active .cat-rename {
-            opacity: 0.85;
+        .subcat-btn.active .cat-rename-hint {
+            color: rgba(255,255,255,0.7);
         }
 
         .subcat-btn.subcat-add {
@@ -1169,7 +1170,12 @@
                     const btn = document.createElement('button');
                     btn.className = 'cat-btn' + (currentCat === cat ? ' active' : '');
                     btn.dataset.cat = cat;
-                    btn.innerHTML = escapeHtml(cat) + '<span class="cat-rename" title="重命名分类">✏️</span> <span class="cat-count">' + count + '</span>';
+                    btn.innerHTML = escapeHtml(cat) + '<span class="cat-count">' + count + '</span><span class="cat-rename-hint">双击改名</span>';
+                    btn.addEventListener('dblclick', (ev) => {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        renameCategory(cat);
+                    });
                     catNav.appendChild(btn);
                 });
 
@@ -1235,7 +1241,11 @@
                     btn.className = 'subcat-btn' + (currentSub === sub ? ' active' : '');
                     btn.dataset.sub = sub;
                     btn.textContent = sub + ' (' + count + ')';
-                    btn.appendChild(buildRenameIcon('rename-sub', sub));
+                    btn.addEventListener('dblclick', (ev) => {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        renameSubcategory(currentCat, sub);
+                    });
                     subcatRow.appendChild(btn);
                 });
 
@@ -1432,16 +1442,6 @@
             }
 
             // ========== 分类重命名 ==========
-            function buildRenameIcon(kind, name) {
-                const icon = document.createElement('span');
-                icon.className = 'cat-rename';
-                icon.title = '重命名分类';
-                icon.textContent = '✏️';
-                icon.dataset.renameKind = kind;
-                icon.dataset.renameName = name;
-                return icon;
-            }
-
             function renameCategory(oldName) {
                 if (!oldName || oldName === '__all__') return;
                 const newName = prompt('修改一级分类名称：', oldName);
@@ -1678,15 +1678,6 @@
 
                 // 一级分类点击
                 catNav.addEventListener('click', (e) => {
-                    const renameIcon = e.target.closest('.cat-rename');
-                    if (renameIcon) {
-                        const btn = renameIcon.closest('.cat-btn');
-                        if (btn && btn.dataset.cat) {
-                            e.stopPropagation();
-                            renameCategory(btn.dataset.cat);
-                        }
-                        return;
-                    }
                     const btn = e.target.closest('.cat-btn');
                     if (!btn) return;
                     if (btn.dataset.cat === undefined) return;
@@ -1697,15 +1688,6 @@
 
                 // 二级分类点击
                 subcatRow.addEventListener('click', (e) => {
-                    const renameIcon = e.target.closest('.cat-rename');
-                    if (renameIcon) {
-                        const btn = renameIcon.closest('.subcat-btn');
-                        if (btn && btn.dataset.sub) {
-                            e.stopPropagation();
-                            renameSubcategory(currentCat, btn.dataset.sub);
-                        }
-                        return;
-                    }
                     const btn = e.target.closest('.subcat-btn');
                     if (!btn) return;
                     if (btn.dataset.sub === undefined) return;
