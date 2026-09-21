@@ -46,19 +46,47 @@ jobs:
               })'
           fi
 
-      - name: Set Pages secret (GIST_TOKEN)
+      - name: Bind KV namespace to Pages project
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
         run: |
-          echo "${{ secrets.GIST_TOKEN }}" | npx wrangler pages secret put GIST_TOKEN --project-name poe-affix
-
-      - name: Set Pages secret (SYNC_KEY)
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-        run: |
-          echo "${{ secrets.SYNC_KEY }}" | npx wrangler pages secret put SYNC_KEY --project-name poe-affix
+          set -euo pipefail
+          echo "Binding KV namespace $KV_NAMESPACE_ID to poe-affix..."
+          PROJ=$(curl -sS -m 30 \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/poe-affix" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+          echo "$PROJ" > /tmp/proj.json
+          node -e '
+          const fs = require("fs");
+          const payload = {
+            deployment_configs: {
+              production: {
+                kv_namespaces: {
+                  AFFIX_KV: { namespace_id: process.env.KV_NAMESPACE_ID }
+                }
+              },
+              preview: {
+                kv_namespaces: {
+                  AFFIX_KV: { namespace_id: process.env.KV_NAMESPACE_ID }
+                }
+              }
+            }
+          };
+          fs.writeFileSync("/tmp/bind-payload.json", JSON.stringify(payload));
+          '
+          curl -sS -m 30 -X PATCH \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/poe-affix" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @/tmp/bind-payload.json | node -e '
+            let i="";process.stdin.on("data",c=>i+=c);process.stdin.on("end",()=>{
+              try{const j=JSON.parse(i);
+                if(!j.success){console.log("Bind KV failed: "+JSON.stringify(j.errors));process.exit(1);}
+                else{console.log("KV binding updated");}
+              }catch(e){console.log("Parse error:"+i.slice(0,300));process.exit(1);}
+            })'
 
       - name: Deploy Pages
         env:
@@ -69,22 +97,15 @@ jobs:
           npx wrangler pages deploy . --project-name poe-affix --commit-dirty=true
 
       - name: Verify deployment
-        env:
-          SYNC_KEY: ${{ secrets.SYNC_KEY }}
         run: |
           echo "=== Waiting for deployment to take effect ==="
-          sleep 30
-          echo "--- Pages homepage ---"
-          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev" || true
-          echo "--- GET /api/gist/data without key (expect 401) ---"
-          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe-affix.pages.dev/api/gist/data" || true
-          echo "--- GET /api/gist/data with key (expect JSON) ---"
-          curl -sS -m 30 "https://poe-affix.pages.dev/api/gist/data" \
-            -H "X-Sync-Key: $SYNC_KEY" | head -c 200 || true
-          echo ""
-          echo "--- POST /api/gist/data with key (write empty array) ---"
-          curl -sS -m 30 -X POST "https://poe-affix.pages.dev/api/gist/data" \
+          sleep 40
+          echo "--- Homepage ---"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe.5as.cn" || true
+          echo "--- GET /api/data without token (expect 401) ---"
+          curl -sS -m 30 -o /dev/null -w "%{http_code}\n" "https://poe.5as.cn/api/data" || true
+          echo "--- Register smoke test (may 409 if exists) ---"
+          curl -sS -m 30 -X POST "https://poe.5as.cn/api/register" \
             -H "Content-Type: application/json" \
-            -H "X-Sync-Key: $SYNC_KEY" \
-            -d '{"affixes":[]}' | head -c 200 || true
+            -d '{"username":"ci_smoke_test","password":"test1234"}' | head -c 200 || true
           echo ""

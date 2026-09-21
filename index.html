@@ -720,7 +720,11 @@
         (function() {
             // ========== 配置 ==========
             const STORAGE_KEY = 'poe_my_affixes_v2';
-            const API_BASE = 'https://poe-affix.a353000446.workers.dev';
+            // 同域 API：线上版走 poe.5as.cn/api（国内可访问）；
+            // 本地双击打开时用线上 API 地址，保证注册/登录可用
+            const API_BASE = (location.protocol === 'http:' || location.protocol === 'https:')
+                ? ''  // 同域
+                : 'https://poe.5as.cn';  // file:// 模式走线上 API
 
             // ========== 状态 ==========
             let affixes = [];              // [{id, category, subcategory, name}]
