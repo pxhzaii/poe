@@ -577,6 +577,17 @@
 
     <script>
         (function() {
+            // ========== 默认配置（首次打开时自动填充） ==========
+            const DEFAULT_AFFIXES = [
+                { id: 'def_1', category: '召唤装备', subcategory: '衣服', name: '召唤生物有能量护盾时，它们的击中无视怪物的元素抗性' },
+                { id: 'def_2', category: '召唤装备', subcategory: '衣服', name: '周围敌人的闪电抗性等同于你' },
+                { id: 'def_3', category: '召唤装备', subcategory: '衣服', name: '基底此物品上装备的光环技能石等级 +#' }
+            ];
+            const DEFAULT_CATEGORIES = [
+                { cat: '召唤装备', subs: ['衣服'] }
+            ];
+            const DEFAULT_FLAG_KEY = 'poe_defaults_loaded';
+
             // ========== 配置 ==========
             const STORAGE_KEY = 'poe_my_affixes_v2';
             const CAT_STORAGE_KEY = 'poe_my_categories_v1';
@@ -655,6 +666,7 @@
 
             // ========== 本地存储 ==========
             function loadFromStorage() {
+                const hasData = localStorage.getItem(STORAGE_KEY) !== null;
                 try {
                     const raw = localStorage.getItem(STORAGE_KEY);
                     if (raw) {
@@ -675,6 +687,16 @@
                 } catch (e) {}
                 if (!affixes) affixes = [];
                 if (!categories) categories = [];
+
+                // 首次打开且无任何本地数据时，加载默认配置
+                if (!hasData && !localStorage.getItem(DEFAULT_FLAG_KEY)) {
+                    affixes = DEFAULT_AFFIXES.map(a => ({ ...a }));
+                    categories = DEFAULT_CATEGORIES.map(c => ({ cat: c.cat, subs: [...c.subs] }));
+                    localStorage.setItem(DEFAULT_FLAG_KEY, '1');
+                    saveToStorage();
+                    return;
+                }
+
                 saveToStorage();
             }
 
