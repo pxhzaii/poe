@@ -1,63 +1,67 @@
 # POE 词缀库
 
-流放之路（POE）词缀速查工具。单文件应用，零依赖，部署到 Cloudflare Pages。
+流放之路（POE）词缀速查工具。单文件应用，零依赖，支持多用户云端同步。
 
 - 线上版：https://poe-affix.pages.dev
+- 云同步 API：https://poe-affix.a353000446.workers.dev
 - 仓库：https://github.com/pxhzaii/poe
 
 ## 功能
 
-- 词缀卡片：名称与数值并列，点击即可复制
-- 分类完全自定义：如「负电甲/召唤衣」「法血/戒指」
+- 词缀卡片：点击即可复制词缀名称
+- 两级分类：一级分类（衣服/鞋子/珠宝/药剂…）+ 二级分类/分组（召唤头/爆炸头/灵体头…）
+- 分类完全自定义：无固定前缀/后缀/特殊，用户自己输入分类名
+- 多用户云端同步：注册账号后数据按用户隔离，多设备可用
 - 本地持久化：数据自动存 localStorage
 - 导入导出：JSON 格式
-- 云端同步：两个按钮，推送/拉取，密码保护
+- 覆盖确认：推送/拉取云端数据时都会弹出覆盖提示，避免误操作
 
 ## 使用方法
 
 1. 打开线上版，或下载 `index.html` 双击用浏览器打开
-2. 点击「添加词缀」→ 填分类、名称、数值 → 保存
-3. 点击卡片上的名称或数值即可复制
+2. 首次使用：注册账号（或点「暂不登录」用本地模式）
+3. 点击「添加词缀」→ 选择/新建一级分类 → 输入词缀名称 → 保存
+4. 点击词缀行即可复制名称
 
-## 云同步
+## 云同步（多用户）
 
-**两个按钮 + 密码输入框，无需其他配置：**
+**注册/登录后自动云同步：**
 
-1. 在密码输入框输入同步密码（浏览器自动记住，下次打开不用重填）
-2. **☁️ 推送云端**：把当前词缀推送到 GitHub Gist 备份
-3. **⬇️ 拉取云端**：用云端数据覆盖本地
+- 数据按用户名隔离在 Cloudflare KV 中，互不可见
+- **☁️ 推送云端**：把当前词缀覆盖推送到当前账号云端
+- **⬇️ 拉取云端**：用云端数据覆盖本地
+- 推送/拉取前均有覆盖确认提示
 
-密码通过请求头 `X-Sync-Key` 传给服务端，服务端校验环境变量 `SYNC_KEY`，不匹配返回 401。
+## 部署
 
-GitHub Token 和同步密码均由服务端（Cloudflare Pages 环境变量）保管，前端不接触任何凭据。Gist 自动创建和管理，用户无感知。
+### Worker（云同步 API）
 
-本地文件模式（双击 index.html）不支持云同步，请使用线上版。
+```bash
+npx wrangler deploy
+```
 
-## 部署（Cloudflare Pages）
+需要绑定 KV 命名空间：
 
-仓库内置 GitHub Actions 自动部署，推送 main 分支或手动触发即可。
+```toml
+[[kv_namespaces]]
+binding = "AFFIX_KV"
+id = "你的KV命名空间ID"
+```
 
-需要在 GitHub 仓库 Settings → Secrets → Actions 配置 4 个 secrets（Cloudflare Pages 项目的 secret 由工作流自动写入，无需手动配置）：
+### 前端（Cloudflare Pages）
 
-| Secret | 说明 | 获取方式 |
-|--------|------|----------|
-| `CF_API_TOKEN` | Cloudflare API Token（Pages 权限） | Cloudflare 控制台 → My Profile → API Tokens → Create Token，选 Edit Cloudflare Workers and Pages 模板 |
-| `CF_ACCOUNT_ID` | Cloudflare 账户 ID | Cloudflare 控制台首页右侧栏，或任意域名 Overview 页面右下角 |
-| `GIST_TOKEN` | GitHub Token（gist 权限） | GitHub → Settings → Developer settings → Personal access tokens (classic)，勾选 gist 权限 |
-| `SYNC_KEY` | 同步密码 | 自定义一个密码字符串，前端输入同样的密码才能推送/拉取 |
-
-工作流自动：创建 Pages 项目 → 写入 Pages secret（GIST_TOKEN + SYNC_KEY）→ 部署 → 验证。
+仓库内置 GitHub Actions 自动部署，推送 main 分支即可。
 
 ## 数据格式
 
 ```json
 [
-  { "id": "xxx", "category": "负电甲/召唤衣", "name": "词缀名称", "value": "数值" }
+  { "id": "xxx", "category": "衣服", "subcategory": "召唤头", "name": "词缀名称" }
 ]
 ```
 
-Gist 文件 `poe-affix-data.json` 内容：
+云端 KV（按用户隔离）：
 
-```json
-{ "affixes": [...], "updated_at": "2026-01-01T00:00:00.000Z" }
-```
+- `user:<username>` → `{ passwordHash, salt }`
+- `data:<username>` → `{ affixes: [...], updated_at: "..." }`
+- `token:<token>` → `{ username, expires }`

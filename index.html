@@ -50,6 +50,7 @@
             display: flex;
             gap: 0.6rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         /* 通用按钮 */
@@ -98,6 +99,113 @@
             border-color: #c04848;
             color: #c04848;
         }
+
+        /* ========== 登录面板 ========== */
+        .auth-panel {
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .auth-panel h2 {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.4rem;
+            text-align: center;
+        }
+
+        .auth-panel .auth-sub {
+            font-size: 0.82rem;
+            color: #8a96a8;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-form-group {
+            margin-bottom: 1rem;
+        }
+
+        .auth-form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #8a96a8;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.35rem;
+        }
+
+        .auth-form-group input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #d0d9e6;
+            color: #2c3e50;
+            padding: 0.6rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.12s;
+        }
+
+        .auth-form-group input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .auth-actions .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 0.6rem 1rem;
+        }
+
+        .auth-hint {
+            margin-top: 0.9rem;
+            font-size: 0.75rem;
+            color: #a0afc0;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .auth-toggle-line {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .auth-toggle-line button {
+            background: none;
+            border: none;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 0.82rem;
+            padding: 0.2rem;
+        }
+
+        .auth-toggle-line button:hover {
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            background: #fef0f0;
+            border: 1px solid #f0b8b8;
+            color: #c04848;
+            padding: 0.5rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .auth-error.show { display: block; }
 
         /* 添加表单 */
         .add-form {
@@ -171,16 +279,16 @@
             margin-top: 0.9rem;
         }
 
-        /* 筛选栏 */
-        .filter-section {
+        /* ========== 两级分类 ========== */
+        .cat-nav {
             display: flex;
             flex-wrap: wrap;
             gap: 0.7rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.8rem;
             align-items: center;
         }
 
-        .filter-btn {
+        .cat-btn {
             background: #ffffff;
             border: 1px solid #d0d9e6;
             color: #4a5568;
@@ -193,28 +301,89 @@
             letter-spacing: 0.2px;
         }
 
-        .filter-btn:hover {
+        .cat-btn:hover {
             background: #f0f5ff;
             border-color: #93b4e8;
             color: #2563eb;
         }
 
-        .filter-btn.active {
+        .cat-btn.active {
             background: #2563eb;
             border-color: #2563eb;
             color: #ffffff;
         }
 
-        .filter-btn.filter-add {
+        .cat-btn .cat-count {
+            font-size: 0.72rem;
+            opacity: 0.7;
+            margin-left: 0.3rem;
+        }
+
+        .cat-btn.cat-add {
             border-style: dashed;
             color: #16a34a;
             border-color: #86d9a8;
         }
 
-        .filter-btn.filter-add:hover {
+        .cat-btn.cat-add:hover {
             background: #f0fdf4;
             border-color: #16a34a;
             color: #16a34a;
+        }
+
+        /* 二级分类行 */
+        .subcat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.7rem 0.9rem;
+            background: #ffffff;
+            border: 1px solid #dce3ec;
+            border-radius: 14px;
+            align-items: center;
+        }
+
+        .subcat-row:empty { display: none; }
+
+        .subcat-btn {
+            background: #eef2f8;
+            border: 1px solid transparent;
+            color: #4a5568;
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .subcat-btn:hover {
+            background: #f0f5ff;
+            border-color: #93b4e8;
+            color: #2563eb;
+        }
+
+        .subcat-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .subcat-btn.subcat-add {
+            background: transparent;
+            border-style: dashed;
+            color: #16a34a;
+            border-color: #86d9a8;
+        }
+
+        .subcat-btn.subcat-add:hover {
+            background: #f0fdf4;
+            border-color: #16a34a;
+        }
+
+        .subcat-label {
+            font-size: 0.75rem;
+            color: #8a96a8;
+            margin-right: 0.2rem;
         }
 
         /* 统计 */
@@ -275,41 +444,7 @@
             white-space: nowrap;
         }
 
-        /* 卡片操作按钮 */
-        .card-actions {
-            display: flex;
-            gap: 0.3rem;
-            opacity: 0.4;
-            transition: opacity 0.15s;
-        }
-
-        .affix-card:hover .card-actions {
-            opacity: 1;
-        }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            color: #a0afc0;
-            cursor: pointer;
-            font-size: 0.95rem;
-            padding: 0.25rem 0.4rem;
-            border-radius: 6px;
-            transition: all 0.1s;
-            line-height: 1;
-        }
-
-        .icon-btn:hover {
-            background: #eef2f8;
-            color: #2563eb;
-        }
-
-        .icon-btn.delete:hover {
-            background: #fef0f0;
-            color: #c04848;
-        }
-
-        /* ========== 词缀行容器 ========== */
+        /* 词缀行容器 */
         .affix-content {
             display: flex;
             flex-direction: column;
@@ -317,7 +452,7 @@
             margin-top: 0.2rem;
         }
 
-        /* 单条词缀行：名称 + 数值 横排 */
+        /* 单条词缀行 */
         .affix-row {
             display: flex;
             align-items: center;
@@ -348,14 +483,6 @@
             color: #2c3e50;
             word-break: break-word;
             line-height: 1.4;
-        }
-
-        .affix-row .affix-value {
-            flex-shrink: 0;
-            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-            font-size: 0.9rem;
-            color: #8a96a8;
-            white-space: nowrap;
         }
 
         .affix-row .affix-copy-icon {
@@ -422,85 +549,39 @@
             line-height: 1.8;
         }
 
-        .sync-key-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
+        /* 卡片操作按钮 */
+        .card-actions {
+            display: flex;
+            gap: 0.3rem;
+            opacity: 0.4;
+            transition: opacity 0.15s;
         }
 
-        /* KV 面板 */
-        .kv-panel {
-            background: #10161f;
-            border: 1px solid #232b37;
-            border-radius: 16px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 1.8rem;
-            display: none;
+        .affix-card:hover .card-actions {
+            opacity: 1;
         }
 
-        .kv-panel.show {
-            display: block;
-        }
-
-        .kv-panel .kv-title {
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: #a0afc0;
+            cursor: pointer;
             font-size: 0.95rem;
-            color: #c9b578;
-            margin-bottom: 0.9rem;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            padding: 0.25rem 0.4rem;
+            border-radius: 6px;
+            transition: all 0.1s;
+            line-height: 1;
         }
 
-        .kv-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 0.8rem;
+        .icon-btn:hover {
+            background: #eef2f8;
+            color: #2563eb;
         }
 
-        .kv-row .kv-field {
-            flex: 1 0 280px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
+        .icon-btn.delete:hover {
+            background: #fef0f0;
+            color: #c04848;
         }
-
-        .kv-field label {
-            font-size: 0.72rem;
-            color: #7e8b9f;
-            letter-spacing: 0.3px;
-        }
-
-        .kv-field input {
-            background: #181f2b;
-            border: 1px solid #2b3546;
-            color: #e3e6ed;
-            padding: 0.5rem 0.9rem;
-            border-radius: 30px;
-            font-size: 0.88rem;
-            outline: none;
-        }
-
-        .kv-field input:focus {
-            border-color: #a58e4a;
-            box-shadow: 0 0 8px rgba(201, 181, 120, 0.2);
-        }
-
-        .kv-actions {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .kv-status {
-            font-size: 0.78rem;
-            color: #5b6a80;
-        }
-
-        .kv-status.ok { color: #7fbf7f; }
-        .kv-status.err { color: #e08a8a; }
 
         @media (max-width: 600px) {
             body { padding: 1.2rem 0.8rem; }
@@ -517,33 +598,59 @@
             <h1>⚔️ 流放之路 · 我的词缀库</h1>
             <div class="header-actions">
                 <button class="btn btn-primary" id="toggleAddForm">➕ 添加词缀</button>
-                <input type="password" id="syncKeyInput" class="sync-key-input" placeholder="同步密码" autocomplete="off" style="width:90px;height:36px;border-radius:30px;border:1px solid #d0d9e6;background:#f8fafc;color:#2c3e50;padding:0 0.8rem;font-size:0.82rem;outline:none;">
-                <button class="btn" id="pushCloudBtn" title="把当前词缀推送到云端备份">☁️ 推送云端</button>
-                <button class="btn" id="pullCloudBtn" title="用云端数据覆盖本地">⬇️ 拉取云端</button>
                 <button class="btn" id="exportBtn">📤 导出</button>
                 <button class="btn" id="importBtn">📥 导入</button>
                 <button class="btn btn-danger" id="clearAllBtn">🗑️ 清空</button>
             </div>
         </div>
 
-        <!-- 添加/编辑表单 -->
+        <!-- 登录面板（未登录时显示） -->
+        <div class="auth-panel" id="authPanel">
+            <h2>☁️ 词缀库多用户版</h2>
+            <div class="auth-sub">登录后数据云端同步，多设备可用</div>
+            <div class="auth-error" id="authError"></div>
+            <div class="auth-form-group">
+                <label>用户名</label>
+                <input type="text" id="authUsername" placeholder="2-20位，中英文/数字/下划线" autocomplete="username">
+            </div>
+            <div class="auth-form-group">
+                <label>密码</label>
+                <input type="password" id="authPassword" placeholder="至少4位" autocomplete="current-password">
+            </div>
+            <div class="auth-actions">
+                <button class="btn btn-primary" id="loginBtn">登录</button>
+                <button class="btn" id="registerBtn">注册</button>
+            </div>
+            <div class="auth-hint">
+                · 数据按用户隔离，互不可见<br>
+                · 未登录时仅保存在本地浏览器
+            </div>
+            <div class="auth-toggle-line">
+                <button id="skipLoginBtn">暂不登录，先用本地模式 →</button>
+            </div>
+        </div>
+
+
+        <!-- 主内容区（未登录或未选择本地模式前隐藏） -->
+        <div id="mainContent" style="display:none;">
+        <!-- 添加表单 -->
         <div class="add-form" id="addForm">
             <div class="form-title" id="formTitle">✨ 添加新词缀</div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>分类</label>
+                    <label>一级分类</label>
                     <div style="display:flex;gap:0.4rem;">
                         <select id="inputCategorySelect" style="flex:1;background:#f8fafc;border:1px solid #d0d9e6;color:#2c3e50;padding:0.5rem 0.7rem;border-radius:30px;font-size:0.88rem;outline:none;cursor:pointer;"></select>
-                        <input type="text" id="inputCategory" placeholder="新建分类" autocomplete="off" style="width:120px;background:#f8fafc;border:1px solid #d0d9e6;color:#2c3e50;padding:0.5rem 0.9rem;border-radius:30px;font-size:0.82rem;outline:none;">
+                        <input type="text" id="inputCategory" placeholder="新建一级分类" autocomplete="off" style="width:130px;background:#f8fafc;border:1px solid #d0d9e6;color:#2c3e50;padding:0.5rem 0.9rem;border-radius:30px;font-size:0.82rem;outline:none;">
                     </div>
                 </div>
-                <div class="form-group" style="flex: 2 0 200px;">
+                <div class="form-group">
+                    <label>二级分类（可选）</label>
+                    <input type="text" id="inputSubcategory" placeholder="如：召唤头（可留空）" autocomplete="off">
+                </div>
+                <div class="form-group" style="flex: 2 0 220px;">
                     <label>词缀名称</label>
                     <input type="text" id="inputName" placeholder="例如：增加最大生命" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label>数值 / 内容（可选）</label>
-                    <input type="text" id="inputValue" placeholder="可选" autocomplete="off">
                 </div>
             </div>
             <div class="form-actions">
@@ -552,15 +659,16 @@
             </div>
         </div>
 
-        <!-- 筛选栏 -->
-        <div class="filter-section" id="filterSection">
-            <button class="filter-btn active" data-filter="__all__">全部</button>
-        </div>
+        <!-- 一级分类导航 -->
+        <div class="cat-nav" id="catNav"></div>
+
+        <!-- 二级分类行 -->
+        <div class="subcat-row" id="subcatRow"></div>
 
         <!-- 统计 -->
         <div class="stats-bar">
             <span id="affixCount">共 0 条词缀</span>
-            <span style="font-size:0.78rem; color:#8a96a8;">数据保存在本地浏览器 · 点击词缀行即可复制名称</span>
+            <span style="font-size:0.78rem; color:#8a96a8;">点击词缀行复制名称</span>
         </div>
 
         <!-- 词缀网格 -->
@@ -568,7 +676,8 @@
 
         <!-- 底部 -->
         <div class="footer-note">
-            <span>名称与数值并列 · 点击任意一个都能复制 · 分类可自定义 · 云端同步需输入密码 · 建议定期导出备份</span>
+            <span id="footerText">名称点击复制 · 两级分类可自定义 · 登录后可云端同步 · 建议定期导出备份</span>
+        </div>
         </div>
     </div>
 
@@ -577,23 +686,29 @@
 
     <script>
         (function() {
+            // ========== 配置 ==========
             const STORAGE_KEY = 'poe_my_affixes_v2';
+            const API_BASE = 'https://poe-affix.a353000446.workers.dev';
 
-            let affixes = [];
-            let currentFilter = '__all__';
+            // ========== 状态 ==========
+            let affixes = [];              // [{id, category, subcategory, name}]
+            let currentCat = '__all__';     // 当前一级分类
+            let currentSub = '__all__';    // 当前二级分类
             let editingId = null;
             let syncing = false;
+            let currentUser = null;        // { username, token }
+            let authMode = 'login';        // login | register
 
+            // ========== DOM ==========
             const grid = document.getElementById('affixGrid');
             const toast = document.getElementById('toast');
             const toastValueSpan = document.getElementById('toastValue');
             const affixCountSpan = document.getElementById('affixCount');
-            const filterSection = document.getElementById('filterSection');
             const addForm = document.getElementById('addForm');
             const formTitle = document.getElementById('formTitle');
             const inputCategory = document.getElementById('inputCategory');
+            const inputSubcategory = document.getElementById('inputSubcategory');
             const inputName = document.getElementById('inputName');
-            const inputValue = document.getElementById('inputValue');
             const categorySelect = document.getElementById('inputCategorySelect');
             const toggleAddFormBtn = document.getElementById('toggleAddForm');
             const saveAffixBtn = document.getElementById('saveAffixBtn');
@@ -601,38 +716,20 @@
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
-            const pushCloudBtn = document.getElementById('pushCloudBtn');
-            const pullCloudBtn = document.getElementById('pullCloudBtn');
-            const syncKeyInput = document.getElementById('syncKeyInput');
+            const catNav = document.getElementById('catNav');
+            const subcatRow = document.getElementById('subcatRow');
+            const authPanel = document.getElementById('authPanel');
+            const mainContent = document.getElementById('mainContent');
+            const authError = document.getElementById('authError');
+            const authUsername = document.getElementById('authUsername');
+            const authPassword = document.getElementById('authPassword');
+            const loginBtnEl = document.getElementById('loginBtn');
+            const registerBtnEl = document.getElementById('registerBtn');
+            const skipLoginBtn = document.getElementById('skipLoginBtn');
 
+            // ========== 工具 ==========
             function generateId() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-            }
-
-            function loadFromStorage() {
-                try {
-                    const raw = localStorage.getItem(STORAGE_KEY);
-                    if (raw) {
-                        const parsed = JSON.parse(raw);
-                        if (Array.isArray(parsed)) {
-                            affixes = parsed;
-                            return;
-                        }
-                    }
-                } catch (e) {
-                    console.warn('读取本地数据失败', e);
-                }
-                affixes = [];
-                saveToStorage();
-            }
-
-            function saveToStorage() {
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(affixes));
-                } catch (e) {
-                    console.error('保存本地数据失败', e);
-                    alert('保存失败，可能是浏览器存储空间不足或被禁用。');
-                }
             }
 
             async function copyToClipboard(text) {
@@ -640,9 +737,7 @@
                     try {
                         await navigator.clipboard.writeText(text);
                         return true;
-                    } catch (err) {
-                        console.warn('clipboard API 失败，尝试降级', err);
-                    }
+                    } catch (err) {}
                 }
                 try {
                     const textarea = document.createElement('textarea');
@@ -657,7 +752,6 @@
                     document.body.removeChild(textarea);
                     return success;
                 } catch (err) {
-                    console.error('复制失败', err);
                     return false;
                 }
             }
@@ -673,197 +767,217 @@
                 }, 1600);
             }
 
-            function getAllCategories() {
-                const set = new Set();
-                affixes.forEach(item => {
-                    if (item.category && item.category.trim()) {
-                        set.add(item.category.trim());
+            // ========== 本地存储 ==========
+            function loadFromStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) {
+                            affixes = parsed;
+                            return;
+                        }
                     }
-                });
-                return Array.from(set).sort();
+                } catch (e) {}
+                affixes = [];
+                saveToStorage();
             }
 
-            function updateCategoryDatalist() {
-                const categories = getAllCategories();
-                // 更新下拉选择框
-                categorySelect.innerHTML = '';
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = '选择分类…';
-                categorySelect.appendChild(placeholder);
-                categories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat;
-                    option.textContent = cat;
-                    categorySelect.appendChild(option);
-                });
-            }
-
-            function renderFilterButtons() {
-                const allBtn = filterSection.querySelector('[data-filter="__all__"]');
-                filterSection.innerHTML = '';
-                filterSection.appendChild(allBtn);
-
-                const categories = getAllCategories();
-                categories.forEach(cat => {
-                    const btn = document.createElement('button');
-                    btn.className = 'filter-btn';
-                    btn.dataset.filter = cat;
-                    btn.textContent = cat;
-                    filterSection.appendChild(btn);
-                });
-
-                // 添加分类快捷按钮
-                const addCatBtn = document.createElement('button');
-                addCatBtn.className = 'filter-btn filter-add';
-                addCatBtn.textContent = '+ 添加分类';
-                addCatBtn.title = '快速新建一个分类';
-                addCatBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const newCat = prompt('输入新分类名称：');
-                    if (newCat && newCat.trim()) {
-                        openAddForm(newCat.trim());
-                    }
-                });
-                filterSection.appendChild(addCatBtn);
-
-                if (currentFilter !== '__all__' && !categories.includes(currentFilter)) {
-                    currentFilter = '__all__';
-                }
-
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                const activeBtn = document.querySelector(`.filter-btn[data-filter="${currentFilter}"]`);
-                if (activeBtn) activeBtn.classList.add('active');
-                else {
-                    currentFilter = '__all__';
-                    allBtn.classList.add('active');
+            function saveToStorage() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(affixes));
+                } catch (e) {
+                    alert('保存失败，可能是浏览器存储空间不足或被禁用。');
                 }
             }
 
-            function bindFilterEvents() {
-                filterSection.addEventListener('click', (e) => {
-                    const btn = e.target.closest('.filter-btn');
-                    if (!btn) return;
-                    const filter = btn.dataset.filter;
-                    if (filter === undefined) return;
-                    currentFilter = filter;
-                    render();
-                });
+            // ========== 云同步 API ==========
+            function getAuthHeaders() {
+                if (!currentUser || !currentUser.token) return {};
+                return { 'Authorization': 'Bearer ' + currentUser.token };
             }
 
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            function createAffixRow(name, value) {
-                const row = document.createElement('div');
-                row.className = 'affix-row';
-                row.title = `点击复制：${name}`;
-
-                const nameEl = document.createElement('span');
-                nameEl.className = 'affix-name';
-                nameEl.textContent = name;
-
-                row.appendChild(nameEl);
-
-                if (value && value.trim()) {
-                    const valueEl = document.createElement('span');
-                    valueEl.className = 'affix-value';
-                    valueEl.textContent = value;
-                    row.appendChild(valueEl);
-                }
-
-                const iconEl = document.createElement('span');
-                iconEl.className = 'affix-copy-icon';
-                iconEl.textContent = '📋';
-                row.appendChild(iconEl);
-
-                row.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    const ok = await copyToClipboard(name);
-                    if (ok) {
-                        showToast(name, '📋 已复制');
-                    }
-                });
-
-                return row;
-            }
-
-            // ---------- 云同步（服务端 /api/gist/data，无需任何配置） ----------
-            function getSyncKey() {
-                return (syncKeyInput.value || '').trim();
-            }
-
-            async function cloudFetch(method, body) {
-                const opts = { method, headers: {} };
-                opts.headers['X-Sync-Key'] = getSyncKey();
+            async function apiRequest(method, path, body) {
+                const opts = { method, headers: { ...getAuthHeaders() } };
                 if (body !== undefined) {
                     opts.headers['Content-Type'] = 'application/json';
                     opts.body = JSON.stringify(body);
                 }
-                const resp = await fetch('/api/gist/data', opts);
+                const resp = await fetch(API_BASE + path, opts);
                 const text = await resp.text();
                 let data = null;
                 try { data = text ? JSON.parse(text) : null; } catch (e) {}
                 if (!resp.ok) {
-                    const msg = (data && data.message) ? data.message : ('HTTP ' + resp.status);
-                    throw new Error(msg);
+                    const msg = (data && data.error) ? data.error : ('HTTP ' + resp.status);
+                    const err = new Error(msg);
+                    err.status = resp.status;
+                    throw err;
                 }
                 return data;
             }
 
+            function showAuthError(msg) {
+                authError.textContent = msg;
+                authError.classList.add('show');
+            }
+
+            function hideAuthError() {
+                authError.classList.remove('show');
+            }
+
+            async function doLogin() {
+                const username = authUsername.value.trim();
+                const password = authPassword.value;
+                if (!username || !password) {
+                    showAuthError('请输入用户名和密码');
+                    return;
+                }
+                loginBtnEl.disabled = true;
+                loginBtnEl.textContent = '⏳ 登录中…';
+                try {
+                    const res = await apiRequest('POST', '/api/login', { username, password });
+                    currentUser = { username: res.username, token: res.token };
+                    localStorage.setItem('poe_auth', JSON.stringify(currentUser));
+                    enterMainApp();
+                } catch (err) {
+                    showAuthError(err.message);
+                } finally {
+                    loginBtnEl.disabled = false;
+                    loginBtnEl.textContent = '登录';
+                }
+            }
+
+            async function doRegister() {
+                const username = authUsername.value.trim();
+                const password = authPassword.value;
+                if (!username || !password) {
+                    showAuthError('请输入用户名和密码');
+                    return;
+                }
+                registerBtnEl.disabled = true;
+                registerBtnEl.textContent = '⏳ 注册中…';
+                try {
+                    const res = await apiRequest('POST', '/api/register', { username, password });
+                    currentUser = { username: res.username, token: res.token };
+                    localStorage.setItem('poe_auth', JSON.stringify(currentUser));
+                    enterMainApp();
+                } catch (err) {
+                    showAuthError(err.message);
+                } finally {
+                    registerBtnEl.disabled = false;
+                    registerBtnEl.textContent = '注册';
+                }
+            }
+
+            async function enterMainApp() {
+                hideAuthError();
+                authPanel.style.display = 'none';
+                mainContent.style.display = 'block';
+                if (currentUser && currentUser.token) {
+                    // 已登录：自动拉取云端数据
+                    try {
+                        const res = await apiRequest('GET', '/api/data');
+                        if (res && Array.isArray(res.affixes)) {
+                            const localCount = affixes.length;
+                            if (res.affixes.length > 0) {
+                                // 云端有数据 → 覆盖本地
+                                if (localCount === 0 || confirm(`云端有 ${res.affixes.length} 条词缀（本地 ${localCount} 条）。\n点击「确定」用云端数据覆盖本地，点击「取消」保留本地数据。`)) {
+                                    affixes = res.affixes;
+                                    saveToStorage();
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        showToast('云端数据拉取失败：' + err.message, '⚠️');
+                    }
+                }
+                updateHeaderForUser();
+                render();
+            }
+
+            function updateHeaderForUser() {
+                // 在头部显示用户名 + 推送/拉取按钮（登录后才显示）
+                let userArea = document.getElementById('userArea');
+                if (!userArea) {
+                    userArea = document.createElement('div');
+                    userArea.id = 'userArea';
+                    userArea.style.cssText = 'display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;';
+                    document.querySelector('.header-actions').prepend(userArea);
+                }
+                if (currentUser && currentUser.username) {
+                    userArea.innerHTML = '';
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = '👤 ' + currentUser.username;
+                    nameSpan.style.cssText = 'font-size:0.85rem;color:#2563eb;padding:0.3rem 0.7rem;background:#eef5ff;border-radius:20px;border:1px solid #c6dcff;';
+                    userArea.appendChild(nameSpan);
+
+                    const pushBtn = document.createElement('button');
+                    pushBtn.className = 'btn';
+                    pushBtn.textContent = '☁️ 推送云端';
+                    pushBtn.addEventListener('click', pushCloud);
+                    userArea.appendChild(pushBtn);
+
+                    const pullBtn = document.createElement('button');
+                    pullBtn.className = 'btn';
+                    pullBtn.textContent = '⬇️ 拉取云端';
+                    pullBtn.addEventListener('click', pullCloud);
+                    userArea.appendChild(pullBtn);
+
+                    const logoutBtn = document.createElement('button');
+                    logoutBtn.className = 'btn';
+                    logoutBtn.textContent = '🚪 退出';
+                    logoutBtn.addEventListener('click', doLogout);
+                    userArea.appendChild(logoutBtn);
+                } else {
+                    userArea.innerHTML = '';
+                    const localNote = document.createElement('span');
+                    localNote.textContent = '🖥️ 本地模式';
+                    localNote.style.cssText = 'font-size:0.85rem;color:#8a96a8;padding:0.3rem 0.7rem;background:#f0f2f5;border-radius:20px;border:1px solid #dce3ec;';
+                    userArea.appendChild(localNote);
+                }
+            }
+
+            function doLogout() {
+                currentUser = null;
+                localStorage.removeItem('poe_auth');
+                authPanel.style.display = 'block';
+                mainContent.style.display = 'none';
+                updateHeaderForUser();
+            }
+
             async function pushCloud() {
                 if (syncing) return;
-                if (location.protocol === 'file:') {
-                    alert('本地文件模式不支持云同步，请使用线上版：\nhttps://poe-affix.pages.dev');
+                if (!currentUser || !currentUser.token) {
+                    alert('请先登录');
                     return;
                 }
-                if (!getSyncKey()) {
-                    alert('请先输入同步密码');
-                    syncKeyInput.focus();
-                    return;
-                }
-                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端（覆盖云端旧数据），继续？`)) return;
+                if (!confirm(`将当前 ${affixes.length} 条词缀推送到云端，会覆盖云端「${currentUser.username}」名下旧数据。继续？`)) return;
                 syncing = true;
-                const oldText = pushCloudBtn.textContent;
-                pushCloudBtn.textContent = '⏳ 推送中…';
-                pushCloudBtn.disabled = true;
                 try {
-                    const res = await cloudFetch('POST', { affixes: affixes });
-                    showToast('已推送 ' + (res.count != null ? res.count : affixes.length) + ' 条到云端', '☁️');
+                    await apiRequest('POST', '/api/data', { affixes });
+                    showToast('已推送 ' + affixes.length + ' 条到云端', '☁️');
                 } catch (err) {
                     alert('推送失败：' + err.message);
                 } finally {
                     syncing = false;
-                    pushCloudBtn.textContent = oldText;
-                    pushCloudBtn.disabled = false;
                 }
             }
 
             async function pullCloud() {
                 if (syncing) return;
-                if (location.protocol === 'file:') {
-                    alert('本地文件模式不支持云同步，请使用线上版：\nhttps://poe-affix.pages.dev');
-                    return;
-                }
-                if (!getSyncKey()) {
-                    alert('请先输入同步密码');
-                    syncKeyInput.focus();
+                if (!currentUser || !currentUser.token) {
+                    alert('请先登录');
                     return;
                 }
                 syncing = true;
-                const oldText = pullCloudBtn.textContent;
-                pullCloudBtn.textContent = '⏳ 拉取中…';
-                pullCloudBtn.disabled = true;
                 try {
-                    const res = await cloudFetch('GET');
-                    const remote = (res && res.affixes != null) ? res.affixes : [];
+                    const res = await apiRequest('GET', '/api/data');
+                    const remote = (res && Array.isArray(res.affixes)) ? res.affixes : [];
                     const when = res && res.updated_at ? res.updated_at.slice(0, 19).replace('T', ' ') : '';
                     if (remote.length === 0) {
                         alert('云端没有数据');
                     } else {
+                        if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），拉取将用云端数据覆盖本地。继续？`)) return;
                         affixes = remote;
                         saveToStorage();
                         render();
@@ -873,22 +987,138 @@
                     alert('拉取失败：' + err.message);
                 } finally {
                     syncing = false;
-                    pullCloudBtn.textContent = oldText;
-                    pullCloudBtn.disabled = false;
                 }
             }
 
-            // ---------- 渲染 ----------
-            function render() {
-                updateCategoryDatalist();
-                renderFilterButtons();
+            // ========== 分类管理 ==========
+            function getAllCategories() {
+                const map = new Map(); // category -> Set(subcategory)
+                affixes.forEach(item => {
+                    const cat = (item.category && item.category.trim()) || '未分类';
+                    const sub = (item.subcategory && item.subcategory.trim()) || '';
+                    if (!map.has(cat)) map.set(cat, new Set());
+                    if (sub) map.get(cat).add(sub);
+                });
+                return map;
+            }
 
-                const filtered = currentFilter === '__all__'
-                    ? affixes
-                    : affixes.filter(item => item.category === currentFilter);
+            function getCategoryList() {
+                const map = getAllCategories();
+                return Array.from(map.keys()).sort();
+            }
+
+            function getSubcategoryList(cat) {
+                const map = getAllCategories();
+                return Array.from(map.get(cat) || []).sort();
+            }
+
+            // ========== 渲染 ==========
+            function updateCategorySelect() {
+                const cats = getCategoryList();
+                categorySelect.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = '选择一级分类…';
+                categorySelect.appendChild(placeholder);
+                cats.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    categorySelect.appendChild(option);
+                });
+            }
+
+            function renderCatNav() {
+                catNav.innerHTML = '';
+                const map = getAllCategories();
+
+                const allBtn = document.createElement('button');
+                allBtn.className = 'cat-btn' + (currentCat === '__all__' ? ' active' : '');
+                allBtn.textContent = '全部';
+                allBtn.dataset.cat = '__all__';
+                catNav.appendChild(allBtn);
+
+                Array.from(map.keys()).sort().forEach(cat => {
+                    const count = affixes.filter(a => ((a.category || '未分类') === cat)).length;
+                    const btn = document.createElement('button');
+                    btn.className = 'cat-btn' + (currentCat === cat ? ' active' : '');
+                    btn.dataset.cat = cat;
+                    btn.innerHTML = escapeHtml(cat) + ' <span class="cat-count">' + count + '</span>';
+                    catNav.appendChild(btn);
+                });
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'cat-btn cat-add';
+                addBtn.textContent = '+ 添加分类';
+                addBtn.addEventListener('click', () => {
+                    const newCat = prompt('输入新的一级分类名称（如：衣服、鞋子、珠宝）：');
+                    if (newCat && newCat.trim()) {
+                        openAddForm(newCat.trim());
+                    }
+                });
+                catNav.appendChild(addBtn);
+            }
+
+            function renderSubcatRow() {
+                subcatRow.innerHTML = '';
+                if (currentCat === '__all__') return;
+
+                const subs = getSubcategoryList(currentCat);
+                if (subs.length === 0) return;
+
+                const label = document.createElement('span');
+                label.className = 'subcat-label';
+                label.textContent = '分组：';
+                subcatRow.appendChild(label);
+
+                const allBtn = document.createElement('button');
+                allBtn.className = 'subcat-btn' + (currentSub === '__all__' ? ' active' : '');
+                allBtn.textContent = '全部';
+                allBtn.dataset.sub = '__all__';
+                subcatRow.appendChild(allBtn);
+
+                subs.forEach(sub => {
+                    const count = affixes.filter(a => (a.category === currentCat && a.subcategory === sub)).length;
+                    const btn = document.createElement('button');
+                    btn.className = 'subcat-btn' + (currentSub === sub ? ' active' : '');
+                    btn.dataset.sub = sub;
+                    btn.textContent = sub + ' (' + count + ')';
+                    subcatRow.appendChild(btn);
+                });
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'subcat-btn subcat-add';
+                addBtn.textContent = '+ 分组';
+                addBtn.addEventListener('click', () => {
+                    const newSub = prompt(`在「${currentCat}」下新建二级分类/分组名称：`);
+                    if (newSub && newSub.trim()) {
+                        openAddForm(currentCat, newSub.trim());
+                    }
+                });
+                subcatRow.appendChild(addBtn);
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function render() {
+                updateCategorySelect();
+                renderCatNav();
+                renderSubcatRow();
+
+                let filtered = affixes;
+                if (currentCat !== '__all__') {
+                    filtered = filtered.filter(item => (item.category || '未分类') === currentCat);
+                }
+                if (currentSub !== '__all__' && currentCat !== '__all__') {
+                    filtered = filtered.filter(item => (item.subcategory || '') === currentSub);
+                }
 
                 affixCountSpan.textContent = `共 ${affixes.length} 条词缀` +
-                    (currentFilter !== '__all__' ? `（当前显示 ${filtered.length} 条）` : '');
+                    (filtered.length !== affixes.length ? `（当前显示 ${filtered.length} 条）` : '');
 
                 grid.innerHTML = '';
 
@@ -896,7 +1126,7 @@
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'empty-state';
                     if (affixes.length === 0) {
-                        emptyDiv.innerHTML = '📭 还没有任何词缀<br><span style="font-size:0.85rem;color:#4f5d72;">点击右上角「添加词缀」开始创建，分类可自定义</span>';
+                        emptyDiv.innerHTML = '📭 还没有任何词缀<br><span style="font-size:0.85rem;color:#4f5d72;">点击右上角「添加词缀」开始创建</span>';
                     } else {
                         emptyDiv.innerHTML = '🔍 该分类下没有词缀';
                     }
@@ -904,31 +1134,32 @@
                     return;
                 }
 
-                // 按分类分组
+                // 按 (category, subcategory) 分组
                 const groups = {};
                 const groupOrder = [];
                 filtered.forEach(item => {
                     const cat = item.category || '未分类';
-                    if (!groups[cat]) {
-                        groups[cat] = [];
-                        groupOrder.push(cat);
+                    const sub = item.subcategory || '';
+                    const key = cat + '||' + sub;
+                    if (!groups[key]) {
+                        groups[key] = { cat, sub, items: [] };
+                        groupOrder.push(key);
                     }
-                    groups[cat].push(item);
+                    groups[key].items.push(item);
                 });
 
-                groupOrder.forEach(cat => {
-                    const items = groups[cat];
+                groupOrder.forEach(key => {
+                    const g = groups[key];
                     const card = document.createElement('div');
                     card.className = 'affix-card';
 
-                    // 头部：分类 + 操作按钮
                     const cardHeader = document.createElement('div');
                     cardHeader.className = 'affix-card-header';
 
                     const catEl = document.createElement('span');
                     catEl.className = 'affix-category';
-                    catEl.textContent = cat;
-                    catEl.title = cat;
+                    catEl.textContent = g.sub ? (g.cat + ' · ' + g.sub) : g.cat;
+                    catEl.title = g.sub ? (g.cat + ' · ' + g.sub) : g.cat;
 
                     const headerRight = document.createElement('div');
                     headerRight.style.display = 'flex';
@@ -936,22 +1167,19 @@
                     headerRight.style.gap = '0.3rem';
 
                     const countEl = document.createElement('span');
-                    countEl.style.fontSize = '0.72rem';
-                    countEl.style.color = '#5b6a80';
-                    countEl.textContent = items.length + ' 条';
+                    countEl.style.cssText = 'font-size:0.72rem;color:#5b6a80;';
+                    countEl.textContent = g.items.length + ' 条';
 
                     headerRight.appendChild(countEl);
-
                     cardHeader.appendChild(catEl);
                     cardHeader.appendChild(headerRight);
 
                     const contentWrap = document.createElement('div');
                     contentWrap.className = 'affix-content';
 
-                    items.forEach(item => {
-                        const row = createAffixRow(item.name, item.value || '');
+                    g.items.forEach(item => {
+                        const row = createAffixRow(item);
 
-                        // 编辑按钮
                         const editBtn = document.createElement('button');
                         editBtn.className = 'icon-btn edit';
                         editBtn.title = '编辑';
@@ -962,7 +1190,6 @@
                             startEdit(item.id);
                         });
 
-                        // 删除按钮
                         const delBtn = document.createElement('button');
                         delBtn.className = 'icon-btn delete';
                         delBtn.title = '删除';
@@ -984,29 +1211,55 @@
                 });
             }
 
+            function createAffixRow(item) {
+                const row = document.createElement('div');
+                row.className = 'affix-row';
+                row.title = '点击复制：' + item.name;
+
+                const nameEl = document.createElement('span');
+                nameEl.className = 'affix-name';
+                nameEl.textContent = item.name;
+                row.appendChild(nameEl);
+
+                const iconEl = document.createElement('span');
+                iconEl.className = 'affix-copy-icon';
+                iconEl.textContent = '📋';
+                row.appendChild(iconEl);
+
+                row.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const ok = await copyToClipboard(item.name);
+                    if (ok) showToast(item.name, '📋 已复制');
+                });
+
+                return row;
+            }
+
+            // ========== 表单 ==========
             function getSelectedCategory() {
-                // 优先用新建分类输入框的值，否则用下拉选择
                 const newCat = inputCategory.value.trim();
                 if (newCat) return newCat;
                 return categorySelect.value.trim();
             }
 
-            function openAddForm(presetCategory) {
+            function openAddForm(presetCategory, presetSub) {
                 editingId = null;
                 formTitle.textContent = '✨ 添加新词缀';
                 categorySelect.value = '';
                 inputCategory.value = '';
-                // 如果指定了预选分类（从筛选按钮快速添加），自动选中
+                inputSubcategory.value = '';
                 if (presetCategory) {
-                    const cats = getAllCategories();
+                    const cats = getCategoryList();
                     if (cats.includes(presetCategory)) {
                         categorySelect.value = presetCategory;
                     } else {
                         inputCategory.value = presetCategory;
                     }
                 }
+                if (presetSub) {
+                    inputSubcategory.value = presetSub;
+                }
                 inputName.value = '';
-                inputValue.value = '';
                 addForm.classList.add('show');
                 inputName.focus();
             }
@@ -1015,7 +1268,6 @@
                 addForm.classList.remove('show');
                 editingId = null;
                 inputName.value = '';
-                inputValue.value = '';
             }
 
             function startEdit(id) {
@@ -1023,8 +1275,7 @@
                 if (!item) return;
                 editingId = id;
                 formTitle.textContent = '✏️ 编辑词缀';
-                // 如果已有分类在下拉里就选中，否则清空让用户新建
-                const cats = getAllCategories();
+                const cats = getCategoryList();
                 if (cats.includes(item.category)) {
                     categorySelect.value = item.category || '';
                     inputCategory.value = '';
@@ -1032,8 +1283,8 @@
                     categorySelect.value = '';
                     inputCategory.value = item.category || '';
                 }
+                inputSubcategory.value = item.subcategory || '';
                 inputName.value = item.name;
-                inputValue.value = item.value;
                 addForm.classList.add('show');
                 inputName.focus();
                 addForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1041,11 +1292,11 @@
 
             function saveAffix() {
                 const category = getSelectedCategory();
+                const subcategory = inputSubcategory.value.trim();
                 const name = inputName.value.trim();
-                const value = inputValue.value.trim();
 
                 if (!category) {
-                    alert('请选择或输入分类');
+                    alert('请选择或输入一级分类');
                     categorySelect.focus();
                     return;
                 }
@@ -1058,7 +1309,7 @@
                 if (editingId) {
                     const index = affixes.findIndex(a => a.id === editingId);
                     if (index !== -1) {
-                        affixes[index] = { ...affixes[index], category, name, value };
+                        affixes[index] = { ...affixes[index], category, subcategory, name };
                     }
                     saveToStorage();
                     render();
@@ -1067,20 +1318,18 @@
                     affixes.push({
                         id: generateId(),
                         category,
-                        name,
-                        value
+                        subcategory,
+                        name
                     });
                     saveToStorage();
                     render();
-                    // 连续添加：保持表单打开，保留分类，清空名称和数值
-                    inputName.value = '';
-                    inputValue.value = '';
-                    // 把新建的分类同步到下拉框
-                    const cats = getAllCategories();
+                    // 连续添加模式：保留分类，清空名称
+                    const cats = getCategoryList();
                     if (cats.includes(category)) {
                         categorySelect.value = category;
                         inputCategory.value = '';
                     }
+                    inputName.value = '';
                     inputName.focus();
                 }
             }
@@ -1137,18 +1386,19 @@
                                 return;
                             }
                             const valid = imported.filter(item =>
-                                item && typeof item.name === 'string' && typeof item.value === 'string'
+                                item && typeof item.name === 'string'
                             ).map(item => ({
                                 id: item.id || generateId(),
                                 category: (item.category && typeof item.category === 'string') ? item.category.trim() : '未分类',
+                                subcategory: (item.subcategory && typeof item.subcategory === 'string') ? item.subcategory.trim() : '',
                                 name: item.name,
-                                value: item.value
+                                value: (item.value && typeof item.value === 'string') ? item.value : ''
                             }));
                             if (valid.length === 0) {
                                 alert('没有找到有效的词缀数据');
                                 return;
                             }
-                            if (!confirm(`即将导入 ${valid.length} 条词缀。\n当前已有 ${affixes.length} 条，导入后总数将为 ${affixes.length + valid.length} 条。是否继续？`)) return;
+                            if (!confirm(`即将导入 ${valid.length} 条词缀。\n当前已有 ${affixes.length} 条。是否继续？`)) return;
                             affixes = affixes.concat(valid);
                             saveToStorage();
                             render();
@@ -1162,6 +1412,7 @@
                 input.click();
             }
 
+            // ========== 事件绑定 ==========
             function bindEvents() {
                 toggleAddFormBtn.addEventListener('click', () => {
                     if (addForm.classList.contains('show')) {
@@ -1177,47 +1428,80 @@
                 inputName.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        inputValue.focus();
-                    }
-                });
-                inputValue.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
                         saveAffix();
                     }
                 });
-
-                // 云同步
-                pushCloudBtn.addEventListener('click', pushCloud);
-                pullCloudBtn.addEventListener('click', pullCloud);
 
                 exportBtn.addEventListener('click', exportData);
                 importBtn.addEventListener('click', importData);
                 clearAllBtn.addEventListener('click', clearAll);
 
+                // 一级分类点击
+                catNav.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.cat-btn');
+                    if (!btn) return;
+                    if (btn.dataset.cat === undefined) return;
+                    currentCat = btn.dataset.cat;
+                    currentSub = '__all__';
+                    render();
+                });
+
+                // 二级分类点击
+                subcatRow.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.subcat-btn');
+                    if (!btn) return;
+                    if (btn.dataset.sub === undefined) return;
+                    currentSub = btn.dataset.sub;
+                    render();
+                });
+
+                // 登录/注册
+                loginBtnEl.addEventListener('click', doLogin);
+                registerBtnEl.addEventListener('click', doRegister);
+                skipLoginBtn.addEventListener('click', () => {
+                    enterLocalMode();
+                });
+
+                authPassword.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        doLogin();
+                    }
+                });
+
                 toast.addEventListener('click', () => {
                     toast.classList.remove('show');
                     if (toastTimer) clearTimeout(toastTimer);
                 });
-
-                bindFilterEvents();
             }
 
+            function enterLocalMode() {
+                authPanel.style.display = 'none';
+                mainContent.style.display = 'block';
+                currentUser = null;
+                updateHeaderForUser();
+                render();
+            }
+
+            // ========== 启动 ==========
             function init() {
                 loadFromStorage();
-                // 回填同步密码
-                try {
-                    const savedKey = localStorage.getItem('poe_sync_key');
-                    if (savedKey) syncKeyInput.value = savedKey;
-                } catch (e) {}
-                syncKeyInput.addEventListener('change', function() {
-                    try { localStorage.setItem('poe_sync_key', getSyncKey()); } catch (e) {}
-                });
-                syncKeyInput.addEventListener('blur', function() {
-                    try { localStorage.setItem('poe_sync_key', getSyncKey()); } catch (e) {}
-                });
                 bindEvents();
-                render();
+
+                // 尝试恢复登录状态
+                try {
+                    const saved = localStorage.getItem('poe_auth');
+                    if (saved) {
+                        currentUser = JSON.parse(saved);
+                    }
+                } catch (e) {}
+
+                if (currentUser && currentUser.token) {
+                    enterMainApp();
+                } else {
+                    authPanel.style.display = 'block';
+                    mainContent.style.display = 'none';
+                }
             }
 
             init();
