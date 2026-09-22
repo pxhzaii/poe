@@ -141,7 +141,7 @@
             font-size: 0.88rem;
         }
 
-        /* ========== 两级分类 ========== */
+        /* ========== 一级分类 ========== */
         .cat-nav {
             display: flex;
             flex-wrap: wrap;
@@ -201,7 +201,8 @@
             white-space: nowrap;
         }
         .cat-btn:hover .cat-rename-hint,
-        .subcat-btn:hover .cat-rename-hint {
+        .subcat-btn:hover .cat-rename-hint,
+        .subsubcat-btn:hover .cat-rename-hint {
             display: inline;
         }
 
@@ -210,7 +211,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.8rem;
             padding: 0.7rem 0.9rem;
             background: #ffffff;
             border: 1px solid #dce3ec;
@@ -260,6 +261,65 @@
 
         .subcat-label {
             font-size: 0.75rem;
+            color: #8a96a8;
+            margin-right: 0.2rem;
+        }
+
+        /* 三级分类行 */
+        .subsubcat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.6rem 0.9rem;
+            background: #fdfdfe;
+            border: 1px solid #e8edf4;
+            border-radius: 14px;
+            align-items: center;
+        }
+
+        .subsubcat-row:empty { display: none; }
+
+        .subsubcat-btn {
+            background: #f4f7fc;
+            border: 1px solid transparent;
+            color: #5b6a80;
+            padding: 0.3rem 0.95rem;
+            border-radius: 18px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .subsubcat-btn:hover {
+            background: #f0f5ff;
+            border-color: #93b4e8;
+            color: #2563eb;
+        }
+
+        .subsubcat-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .subsubcat-btn.active .cat-rename-hint {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .subsubcat-btn.subsubcat-add {
+            background: transparent;
+            border-style: dashed;
+            color: #16a34a;
+            border-color: #86d9a8;
+        }
+
+        .subsubcat-btn.subsubcat-add:hover {
+            background: #f0fdf4;
+            border-color: #16a34a;
+        }
+
+        .subsubcat-label {
+            font-size: 0.72rem;
             color: #8a96a8;
             margin-right: 0.2rem;
         }
@@ -518,7 +578,6 @@
             body { padding: 1.2rem 0.8rem; }
             .header h1 { font-size: 1.25rem; }
             .affix-grid { grid-template-columns: 1fr; }
-            .form-row { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -549,25 +608,28 @@
         <!-- 二级分类行 -->
         <div class="subcat-row" id="subcatRow"></div>
 
+        <!-- 三级分类行 -->
+        <div class="subsubcat-row" id="subsubcatRow"></div>
+
         <!-- 快速添加栏 -->
         <div class="quick-add" id="quickAddBar">
-            <input type="text" id="quickAddInput" placeholder="输入词缀名称，回车或点按钮添加…" autocomplete="off">
+            <input type="text" id="quickAddInput" placeholder="输入词条名称，回车或点按钮添加…" autocomplete="off">
             <button class="btn btn-primary quick-add-btn" id="quickAddBtn">添加</button>
             <span class="quick-add-hint" id="quickAddHint"></span>
         </div>
 
         <!-- 统计 -->
         <div class="stats-bar">
-            <span id="affixCount">共 0 条词缀</span>
-            <span style="font-size:0.78rem; color:#8a96a8;">点击词缀行复制名称</span>
+            <span id="affixCount">共 0 条词条</span>
+            <span style="font-size:0.78rem; color:#8a96a8;">点击词条行复制名称</span>
         </div>
 
-        <!-- 词缀网格 -->
+        <!-- 词条网格 -->
         <div class="affix-grid" id="affixGrid"></div>
 
         <!-- 底部 -->
         <div class="footer-note">
-                <span id="footerText">名称点击复制 · 选分类后在添加栏输入词缀回车/点按钮即可 · ✏️行内编辑 · 双击分类名可重命名</span>
+                <span id="footerText">名称点击复制 · 选分类后在添加栏输入词条回车/点按钮即可 · ✏️行内编辑 · 双击分类名可重命名</span>
         </div>
         </div>
     </div>
@@ -577,14 +639,14 @@
 
     <script>
         (function() {
-            // ========== 默认配置（首次打开时自动填充） ==========
+            // ========== 默认配置（首次打开时自动填充，三级分类） ==========
             const DEFAULT_AFFIXES = [
-                { id: 'def_1', category: '召唤装备', subcategory: '衣服', name: '召唤生物有能量护盾时，它们的击中无视怪物的元素抗性' },
-                { id: 'def_2', category: '召唤装备', subcategory: '衣服', name: '周围敌人的闪电抗性等同于你' },
-                { id: 'def_3', category: '召唤装备', subcategory: '衣服', name: '基底此物品上装备的光环技能石等级 +#' }
+                { id: 'def_1', category: '召唤装备', subcategory: '衣服', subsubcategory: '塑血巨匠', name: '召唤生物有能量护盾时，它们的击中无视怪物的元素抗性' },
+                { id: 'def_2', category: '召唤装备', subcategory: '衣服', subsubcategory: '塑血巨匠', name: '周围敌人的闪电抗性等同于你' },
+                { id: 'def_3', category: '召唤装备', subcategory: '衣服', subsubcategory: '塑血巨匠', name: '基底此物品上装备的光环技能石等级 +#' }
             ];
             const DEFAULT_CATEGORIES = [
-                { cat: '召唤装备', subs: ['衣服'] }
+                { cat: '召唤装备', subs: [{ sub: '衣服', subs: ['塑血巨匠'] }] }
             ];
             const DEFAULT_FLAG_KEY = 'poe_defaults_loaded';
 
@@ -598,12 +660,13 @@
                 : 'https://poe.5as.cn';  // file:// 模式走线上 API
 
             // ========== 状态 ==========
-            let affixes = [];              // [{id, category, subcategory, name}]
-            let categories = [];           // [{cat, subs:[]}]  独立存储的分类结构
-            let currentCat = '__all__';     // 当前一级分类
+            let affixes = [];              // [{id, category, subcategory, subsubcategory, name}]
+            let categories = [];           // [{cat, subs: [{sub, subs: []}]}]  独立存储的三级分类结构
+            let currentCat = '__all__';    // 当前一级分类
             let currentSub = '__all__';    // 当前二级分类
+            let currentSubSub = '__all__'; // 当前三级分类（细分类）
             let syncing = false;
-            let cloudPassword = null;     // 云端同步密码
+            let cloudPassword = null;      // 云端同步密码
             const PWD_KEY = 'poe_sync_password';
             const syncPasswordInput = document.getElementById('syncPassword');
             const pushBtn = document.getElementById('pushBtn');
@@ -616,6 +679,7 @@
             const affixCountSpan = document.getElementById('affixCount');
             const catNav = document.getElementById('catNav');
             const subcatRow = document.getElementById('subcatRow');
+            const subsubcatRow = document.getElementById('subsubcatRow');
             const quickAddBar = document.getElementById('quickAddBar');
             const quickAddInput = document.getElementById('quickAddInput');
             const quickAddHint = document.getElementById('quickAddHint');
@@ -627,6 +691,12 @@
             // ========== 工具 ==========
             function generateId() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
 
             async function copyToClipboard(text) {
@@ -691,7 +761,10 @@
                 // 首次打开且无任何本地数据时，加载默认配置
                 if (!hasData && !localStorage.getItem(DEFAULT_FLAG_KEY)) {
                     affixes = DEFAULT_AFFIXES.map(a => ({ ...a }));
-                    categories = DEFAULT_CATEGORIES.map(c => ({ cat: c.cat, subs: [...c.subs] }));
+                    categories = DEFAULT_CATEGORIES.map(c => ({
+                        cat: c.cat,
+                        subs: c.subs.map(s => ({ sub: s.sub, subs: [...s.subs] }))
+                    }));
                     localStorage.setItem(DEFAULT_FLAG_KEY, '1');
                     saveToStorage();
                     return;
@@ -709,29 +782,32 @@
                 }
             }
 
-            // ========== 分类管理 ==========
-            function ensureCategory(catName, subName) {
+            // ========== 分类结构管理（三级） ==========
+            // 确保 cat > sub > subsub 的路径存在于 categories 中
+            function ensureCategory(catName, subName, subsubName) {
+                catName = (catName || '').trim();
+                if (!catName) return;
                 let entry = categories.find(c => c.cat === catName);
                 if (!entry) {
                     entry = { cat: catName, subs: [] };
                     categories.push(entry);
                 }
-                if (subName && subName.trim() && !entry.subs.includes(subName.trim())) {
-                    entry.subs.push(subName.trim());
+                if (!Array.isArray(entry.subs)) entry.subs = [];
+                if (subName && subName.trim()) {
+                    const sub = subName.trim();
+                    let subEntry = entry.subs.find(s => s && s.sub === sub);
+                    if (!subEntry) {
+                        subEntry = { sub: sub, subs: [] };
+                        entry.subs.push(subEntry);
+                    }
+                    if (!Array.isArray(subEntry.subs)) subEntry.subs = [];
+                    if (subsubName && subsubName.trim()) {
+                        const subsub = subsubName.trim();
+                        if (!subEntry.subs.includes(subsub)) {
+                            subEntry.subs.push(subsub);
+                        }
+                    }
                 }
-                saveToStorage();
-            }
-
-            function removeSubFromCategory(catName, subName) {
-                const entry = categories.find(c => c.cat === catName);
-                if (entry) {
-                    entry.subs = entry.subs.filter(s => s !== subName);
-                    saveToStorage();
-                }
-            }
-
-            function removeCategoryEntry(catName) {
-                categories = categories.filter(c => c.cat !== catName);
                 saveToStorage();
             }
 
@@ -747,14 +823,35 @@
 
             function renameSubEntry(catName, oldSub, newSub) {
                 const entry = categories.find(c => c.cat === catName);
-                if (entry) {
-                    if (!entry.subs.includes(newSub)) {
-                        entry.subs = entry.subs.map(s => s === oldSub ? newSub : s);
-                    } else {
-                        entry.subs = entry.subs.filter(s => s !== oldSub);
-                    }
-                    saveToStorage();
+                if (!entry || !Array.isArray(entry.subs)) return;
+                const oldEntry = entry.subs.find(s => s && s.sub === oldSub);
+                const existing = entry.subs.find(s => s && s.sub === newSub);
+                if (oldEntry && existing && existing !== oldEntry) {
+                    // 同名合并：旧二级分类的三级列表并入新二级分类
+                    if (!Array.isArray(existing.subs)) existing.subs = [];
+                    (oldEntry.subs || []).forEach(ss => {
+                        if (!existing.subs.includes(ss)) existing.subs.push(ss);
+                    });
+                    entry.subs = entry.subs.filter(s => s !== oldEntry);
+                } else if (oldEntry) {
+                    oldEntry.sub = newSub;
                 }
+                saveToStorage();
+            }
+
+            function renameSubSubEntry(catName, subName, oldSubSub, newSubSub) {
+                const entry = categories.find(c => c.cat === catName);
+                if (!entry || !Array.isArray(entry.subs)) return;
+                const subEntry = entry.subs.find(s => s && s.sub === subName);
+                if (!subEntry) return;
+                if (!Array.isArray(subEntry.subs)) subEntry.subs = [];
+                if (newSubSub !== oldSubSub && subEntry.subs.includes(newSubSub)) {
+                    // 同名合并：移除旧三级分类
+                    subEntry.subs = subEntry.subs.filter(s => s !== oldSubSub);
+                } else {
+                    subEntry.subs = subEntry.subs.map(s => s === oldSubSub ? newSubSub : s);
+                }
+                saveToStorage();
             }
 
             // ========== 云同步 API ==========
@@ -803,7 +900,7 @@
                 if (syncing) return;
                 const pwd = getCloudPassword();
                 if (!pwd) { alert('请先输入密码'); return; }
-                if (!confirm(`将当前 ${affixes.length} 条词缀备份到云端，会覆盖云端旧数据。继续？`)) return;
+                if (!confirm(`将当前 ${affixes.length} 条词条备份到云端，会覆盖云端旧数据。继续？`)) return;
                 syncing = true;
                 pushBtn.disabled = true;
                 pushBtn.textContent = '⏳ 备份中…';
@@ -835,7 +932,7 @@
                     if (remote.length === 0 && remoteCats.length === 0) {
                         alert('云端没有数据');
                     } else {
-                        if (!confirm(`云端有 ${remote.length} 条词缀（本地 ${affixes.length} 条），恢复将用云端数据覆盖本地。继续？`)) {
+                        if (!confirm(`云端有 ${remote.length} 条词条（本地 ${affixes.length} 条），恢复将用云端数据覆盖本地。继续？`)) {
                             return;
                         }
                         saveCloudPassword();
@@ -843,7 +940,7 @@
                         categories = remoteCats;
                         saveToStorage();
                         render();
-                        showToast('已恢复 ' + remote.length + ' 条词缀' + (when ? '（' + when + '）' : ''), '⬇️');
+                        showToast('已恢复 ' + remote.length + ' 条词条' + (when ? '（' + when + '）' : ''), '⬇️');
                     }
                 } catch (err) {
                     alert('恢复失败：' + err.message);
@@ -854,39 +951,66 @@
                 }
             }
 
-            // ========== 分类管理 ==========
+            // ========== 分类查询（三级） ==========
+            // 返回 Map<cat, Map<sub, Set<subsub>>>
             function getAllCategories() {
-                const map = new Map(); // category -> Set(subcategory)
-                // 从独立存储的分类结构中加载
+                const map = new Map();
+                const addSub = (cat, sub) => {
+                    if (!map.has(cat)) map.set(cat, new Map());
+                    if (sub && !map.get(cat).has(sub)) map.get(cat).set(sub, new Set());
+                    return map.get(cat);
+                };
+                // 独立存储的分类结构
                 categories.forEach(c => {
-                    if (!map.has(c.cat)) map.set(c.cat, new Set());
-                    c.subs.forEach(s => map.get(c.cat).add(s));
+                    if (!c || !c.cat) return;
+                    addSub(c.cat, null);
+                    (c.subs || []).forEach(s => {
+                        // 兼容旧两级数据：subs 元素可能是字符串
+                        if (typeof s === 'string') {
+                            addSub(c.cat, s);
+                        } else if (s && s.sub) {
+                            addSub(c.cat, s.sub);
+                            (s.subs || []).forEach(ss => {
+                                if (ss) map.get(c.cat).get(s.sub).add(ss);
+                            });
+                        }
+                    });
                 });
-                // 从词缀数据中补充（兼容旧数据）
+                // 从词条数据中补充（覆盖云端/导入的旧数据）
                 affixes.forEach(item => {
                     const cat = (item.category && item.category.trim()) || '未分类';
                     const sub = (item.subcategory && item.subcategory.trim()) || '';
-                    if (!map.has(cat)) map.set(cat, new Set());
-                    if (sub) map.get(cat).add(sub);
+                    const subsub = (item.subsubcategory && item.subsubcategory.trim()) || '';
+                    addSub(cat, sub);
+                    if (sub && subsub) map.get(cat).get(sub).add(subsub);
                 });
                 return map;
             }
 
             function getCategoryList() {
-                const map = getAllCategories();
-                return Array.from(map.keys()).sort();
+                return Array.from(getAllCategories().keys()).sort();
             }
 
             function getSubcategoryList(cat) {
                 const map = getAllCategories();
-                return Array.from(map.get(cat) || []).sort();
+                const subs = map.get(cat);
+                return subs ? Array.from(subs.keys()).sort() : [];
+            }
+
+            function getSubsubcategoryList(cat, sub) {
+                if (!cat || cat === '__all__' || !sub || sub === '__all__') return [];
+                const map = getAllCategories();
+                const subs = map.get(cat);
+                if (!subs) return [];
+                const subsubs = subs.get(sub);
+                return subsubs ? Array.from(subsubs).sort() : [];
             }
 
             // ========== 渲染 ==========
             function renderCatNav() {
                 catNav.innerHTML = '';
                 const map = getAllCategories();
-                // 合并：从数据中提取的分类 + 用户手动创建但还没词缀的分类
+                // 合并：从数据中提取的分类 + 用户手动创建但还没词条的分类
                 const allCats = new Set([...map.keys()]);
                 if (currentCat !== '__all__') allCats.add(currentCat);
 
@@ -914,12 +1038,13 @@
                 addBtn.className = 'cat-btn cat-add';
                 addBtn.textContent = '+ 添加分类';
                 addBtn.addEventListener('click', () => {
-                    const newCat = prompt('输入新的一级分类名称（如：衣服、鞋子、珠宝）：');
+                    const newCat = prompt('输入新的一级分类名称（如：召唤装备、武器、珠宝）：');
                     if (newCat && newCat.trim()) {
                         const name = newCat.trim();
-                        ensureCategory(name, null);
+                        ensureCategory(name, null, null);
                         currentCat = name;
                         currentSub = '__all__';
+                        currentSubSub = '__all__';
                         render();
                     }
                 });
@@ -931,7 +1056,7 @@
                 if (currentCat === '__all__') return;
 
                 const subs = getSubcategoryList(currentCat);
-                // 合并：从数据中提取的 + 用户手动创建但还没词缀的
+                // 合并：从数据中提取的 + 用户手动创建但还没词条的
                 const allSubs = new Set(subs);
                 if (currentSub !== '__all__') allSubs.add(currentSub);
 
@@ -941,11 +1066,12 @@
                     addBtn.className = 'subcat-btn subcat-add';
                     addBtn.textContent = '+ 分类';
                     addBtn.addEventListener('click', () => {
-                        const newSub = prompt(`在「${currentCat}」下新建分类名称：`);
+                        const newSub = prompt(`在「${currentCat}」下新建二级分类名称（如：衣服、头盔、戒指）：`);
                         if (newSub && newSub.trim()) {
                             const name = newSub.trim();
-                            ensureCategory(currentCat, name);
+                            ensureCategory(currentCat, name, null);
                             currentSub = name;
+                            currentSubSub = '__all__';
                             render();
                         }
                     });
@@ -982,15 +1108,84 @@
                 addBtn.className = 'subcat-btn subcat-add';
                 addBtn.textContent = '+ 分类';
                 addBtn.addEventListener('click', () => {
-                    const newSub = prompt(`在「${currentCat}」下新建分类名称：`);
+                    const newSub = prompt(`在「${currentCat}」下新建二级分类名称（如：衣服、头盔、戒指）：`);
                     if (newSub && newSub.trim()) {
                         const name = newSub.trim();
-                        ensureCategory(currentCat, name);
+                        ensureCategory(currentCat, name, null);
                         currentSub = name;
+                        currentSubSub = '__all__';
                         render();
                     }
                 });
                 subcatRow.appendChild(addBtn);
+            }
+
+            function renderSubsubcatRow() {
+                subsubcatRow.innerHTML = '';
+                if (currentCat === '__all__' || currentSub === '__all__') return;
+
+                const subsubs = getSubsubcategoryList(currentCat, currentSub);
+                // 合并：当前选中的（可能来自历史数据）
+                const allSubSubs = new Set(subsubs);
+                if (currentSubSub !== '__all__') allSubSubs.add(currentSubSub);
+
+                if (allSubSubs.size === 0) {
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'subsubcat-btn subsubcat-add';
+                    addBtn.textContent = '+ 细分类';
+                    addBtn.addEventListener('click', () => {
+                        const name = prompt(`在「${currentCat} · ${currentSub}」下新建三级分类名称（如：塑血巨匠）：`);
+                        if (name && name.trim()) {
+                            const trimmed = name.trim();
+                            ensureCategory(currentCat, currentSub, trimmed);
+                            currentSubSub = trimmed;
+                            render();
+                        }
+                    });
+                    subsubcatRow.appendChild(addBtn);
+                    return;
+                }
+
+                const label = document.createElement('span');
+                label.className = 'subsubcat-label';
+                label.textContent = '细分类：';
+                subsubcatRow.appendChild(label);
+
+                const allBtn = document.createElement('button');
+                allBtn.className = 'subsubcat-btn' + (currentSubSub === '__all__' ? ' active' : '');
+                allBtn.textContent = '全部';
+                allBtn.dataset.subsub = '__all__';
+                subsubcatRow.appendChild(allBtn);
+
+                Array.from(allSubSubs).sort().forEach(subsub => {
+                    const count = affixes.filter(a =>
+                        a.category === currentCat && a.subcategory === currentSub && a.subsubcategory === subsub
+                    ).length;
+                    const btn = document.createElement('button');
+                    btn.className = 'subsubcat-btn' + (currentSubSub === subsub ? ' active' : '');
+                    btn.dataset.subsub = subsub;
+                    btn.textContent = subsub + ' (' + count + ')';
+                    btn.addEventListener('dblclick', (ev) => {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        renameSubSubcategory(currentCat, currentSub, subsub);
+                    });
+                    subsubcatRow.appendChild(btn);
+                });
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'subsubcat-btn subsubcat-add';
+                addBtn.textContent = '+ 细分类';
+                addBtn.addEventListener('click', () => {
+                    const name = prompt(`在「${currentCat} · ${currentSub}」下新建三级分类名称（如：塑血巨匠）：`);
+                    if (name && name.trim()) {
+                        const trimmed = name.trim();
+                        ensureCategory(currentCat, currentSub, trimmed);
+                        currentSubSub = trimmed;
+                        render();
+                    }
+                });
+                subsubcatRow.appendChild(addBtn);
             }
 
             function renderQuickAddBar() {
@@ -1003,18 +1198,16 @@
                 if (currentSub !== '__all__') {
                     target = currentCat + ' · ' + currentSub;
                 }
+                if (currentSub !== '__all__' && currentSubSub !== '__all__') {
+                    target = currentCat + ' · ' + currentSub + ' · ' + currentSubSub;
+                }
                 quickAddHint.innerHTML = '添加到 <span class="target">' + escapeHtml(target) + '</span>';
-            }
-
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
             }
 
             function render() {
                 renderCatNav();
                 renderSubcatRow();
+                renderSubsubcatRow();
                 renderQuickAddBar();
 
                 let filtered = affixes;
@@ -1024,8 +1217,11 @@
                 if (currentSub !== '__all__' && currentCat !== '__all__') {
                     filtered = filtered.filter(item => (item.subcategory || '') === currentSub);
                 }
+                if (currentSubSub !== '__all__' && currentSub !== '__all__' && currentCat !== '__all__') {
+                    filtered = filtered.filter(item => (item.subsubcategory || '') === currentSubSub);
+                }
 
-                affixCountSpan.textContent = `共 ${affixes.length} 条词缀` +
+                affixCountSpan.textContent = `共 ${affixes.length} 条词条` +
                     (filtered.length !== affixes.length ? `（当前显示 ${filtered.length} 条）` : '');
 
                 grid.innerHTML = '';
@@ -1034,23 +1230,24 @@
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'empty-state';
                     if (affixes.length === 0) {
-                        emptyDiv.innerHTML = '📭 还没有任何词缀<br><span style="font-size:0.85rem;color:#4f5d72;">先点「+ 添加分类」创建一级分类，选中后会出现添加栏</span>';
+                        emptyDiv.innerHTML = '📭 还没有任何词条<br><span style="font-size:0.85rem;color:#4f5d72;">先点「+ 添加分类」创建一级分类，选中后会出现添加栏</span>';
                     } else {
-                        emptyDiv.innerHTML = '🔍 该分类下没有词缀';
+                        emptyDiv.innerHTML = '🔍 该分类下没有词条';
                     }
                     grid.appendChild(emptyDiv);
                     return;
                 }
 
-                // 按 (category, subcategory) 分类归卡片
+                // 按 (category, subcategory, subsubcategory) 分类归卡片
                 const groups = {};
                 const groupOrder = [];
                 filtered.forEach(item => {
                     const cat = item.category || '未分类';
                     const sub = item.subcategory || '';
-                    const key = cat + '||' + sub;
+                    const subsub = item.subsubcategory || '';
+                    const key = cat + '||' + sub + '||' + subsub;
                     if (!groups[key]) {
-                        groups[key] = { cat, sub, items: [] };
+                        groups[key] = { cat, sub, subsub, items: [] };
                         groupOrder.push(key);
                     }
                     groups[key].items.push(item);
@@ -1066,8 +1263,12 @@
 
                     const catEl = document.createElement('span');
                     catEl.className = 'affix-category';
-                    catEl.textContent = g.sub ? (g.cat + ' · ' + g.sub) : g.cat;
-                    catEl.title = g.sub ? (g.cat + ' · ' + g.sub) : g.cat;
+                    let pathParts = [g.cat];
+                    if (g.sub) pathParts.push(g.sub);
+                    if (g.subsub) pathParts.push(g.subsub);
+                    const pathText = pathParts.join(' · ');
+                    catEl.textContent = pathText;
+                    catEl.title = pathText;
 
                     const headerRight = document.createElement('div');
                     headerRight.style.display = 'flex';
@@ -1171,7 +1372,7 @@
                 return row;
             }
 
-            // ========== 分类重命名 ==========
+            // ========== 分类重命名（三级） ==========
             function renameCategory(oldName) {
                 if (!oldName || oldName === '__all__') return;
                 const newName = prompt('修改一级分类名称：', oldName);
@@ -1197,12 +1398,12 @@
                 if (currentCat === oldName) currentCat = trimmed;
                 saveToStorage();
                 render();
-                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
+                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词条` : ''}`, '✏️');
             }
 
             function renameSubcategory(catName, oldName) {
                 if (!catName || catName === '__all__' || !oldName) return;
-                const newName = prompt(`修改「${catName}」下分类名称：`, oldName);
+                const newName = prompt(`修改「${catName}」下二级分类名称：`, oldName);
                 if (newName === null) return;
                 const trimmed = newName.trim();
                 if (!trimmed) {
@@ -1211,8 +1412,7 @@
                 }
                 if (trimmed === oldName) return;
                 if (getSubcategoryList(catName).includes(trimmed)) {
-                    if (!confirm(`「${catName}」下已存在同名分类「${trimmed}」。
-点击「确定」把「${oldName}」的词缀合并到「${trimmed}」，点击「取消」放弃改名。`)) return;
+                    if (!confirm(`「${catName}」下已存在同名分类「${trimmed}」。\n点击「确定」把「${oldName}」的词条合并到「${trimmed}」，点击「取消」放弃改名。`)) return;
                     // 合并同名分类：把旧词缀归并到新名下
                     affixes.forEach(a => {
                         if ((a.category || '未分类') === catName && (a.subcategory || '') === oldName) {
@@ -1236,7 +1436,49 @@
                 if (currentCat === catName && currentSub === oldName) currentSub = trimmed;
                 saveToStorage();
                 render();
-                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词缀` : ''}`, '✏️');
+                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词条` : ''}`, '✏️');
+            }
+
+            function renameSubSubcategory(catName, subName, oldName) {
+                if (!catName || !subName || !oldName) return;
+                const newName = prompt(`修改「${catName} · ${subName}」下三级分类名称：`, oldName);
+                if (newName === null) return;
+                const trimmed = newName.trim();
+                if (!trimmed) {
+                    showToast('分类名不能为空', '⚠️');
+                    return;
+                }
+                if (trimmed === oldName) return;
+                if (getSubsubcategoryList(catName, subName).includes(trimmed)) {
+                    if (!confirm(`「${subName}」下已存在同名细分类「${trimmed}」。\n点击「确定」把「${oldName}」的词条合并到「${trimmed}」，点击「取消」放弃改名。`)) return;
+                    // 合并同名细分类
+                    affixes.forEach(a => {
+                        if ((a.category || '未分类') === catName &&
+                            (a.subcategory || '') === subName &&
+                            (a.subsubcategory || '') === oldName) {
+                            a.subsubcategory = trimmed;
+                        }
+                    });
+                    renameSubSubEntry(catName, subName, oldName, trimmed);
+                    saveToStorage();
+                    render();
+                    showToast(`已把「${oldName}」合并到「${trimmed}」`, '✏️');
+                    return;
+                }
+                let n = 0;
+                affixes.forEach(a => {
+                    if ((a.category || '未分类') === catName &&
+                        (a.subcategory || '') === subName &&
+                        (a.subsubcategory || '') === oldName) {
+                        a.subsubcategory = trimmed;
+                        n++;
+                    }
+                });
+                renameSubSubEntry(catName, subName, oldName, trimmed);
+                if (currentCat === catName && currentSub === subName && currentSubSub === oldName) currentSubSub = trimmed;
+                saveToStorage();
+                render();
+                showToast(`已把「${oldName}」改名为「${trimmed}」${n ? `，同步更新 ${n} 条词条` : ''}`, '✏️');
             }
 
             // ========== 快速添加 / 行内编辑 ==========
@@ -1248,13 +1490,15 @@
                     return;
                 }
                 const sub = currentSub === '__all__' ? '' : currentSub;
+                const subsub = (currentSub !== '__all__' && currentSubSub !== '__all__') ? currentSubSub : '';
                 affixes.push({
                     id: generateId(),
                     category: currentCat,
                     subcategory: sub,
+                    subsubcategory: subsub,
                     name
                 });
-                if (sub) ensureCategory(currentCat, sub);
+                if (sub) ensureCategory(currentCat, sub, subsub || null);
                 saveToStorage();
                 quickAddInput.value = '';
                 quickAddInput.focus();
@@ -1286,7 +1530,7 @@
                 inlineEditingId = null;
                 if (!trimmed) {
                     // 空名称则删除
-                    if (confirm('名称为空，是否删除该词缀？')) {
+                    if (confirm('名称为空，是否删除该词条？')) {
                         affixes = affixes.filter(a => a.id !== id);
                         saveToStorage();
                     }
@@ -1308,7 +1552,7 @@
             function deleteAffix(id) {
                 const item = affixes.find(a => a.id === id);
                 if (!item) return;
-                if (!confirm(`确定删除词缀「${item.name}」？`)) return;
+                if (!confirm(`确定删除词条「${item.name}」？`)) return;
                 affixes = affixes.filter(a => a.id !== id);
                 saveToStorage();
                 render();
@@ -1320,12 +1564,13 @@
                     alert('已经是空的了');
                     return;
                 }
-                if (!confirm(`确定要清空所有 ${affixes.length} 条词缀和 ${categories.length} 个分类吗？此操作不可恢复！`)) return;
+                if (!confirm(`确定要清空所有 ${affixes.length} 条词条和 ${categories.length} 个分类吗？此操作不可恢复！`)) return;
                 if (!confirm('再次确认：真的要全部删除吗？')) return;
                 affixes = [];
                 categories = [];
                 currentCat = '__all__';
                 currentSub = '__all__';
+                currentSubSub = '__all__';
                 saveToStorage();
                 render();
             }
@@ -1355,7 +1600,7 @@
                         try {
                             const imported = JSON.parse(ev.target.result);
                             if (!Array.isArray(imported)) {
-                                alert('文件格式不正确，应为词缀数组');
+                                alert('文件格式不正确，应为词条数组');
                                 return;
                             }
                             const valid = imported.filter(item =>
@@ -1364,18 +1609,18 @@
                                 id: item.id || generateId(),
                                 category: (item.category && typeof item.category === 'string') ? item.category.trim() : '未分类',
                                 subcategory: (item.subcategory && typeof item.subcategory === 'string') ? item.subcategory.trim() : '',
-                                name: item.name,
-                                value: (item.value && typeof item.value === 'string') ? item.value : ''
+                                subsubcategory: (item.subsubcategory && typeof item.subsubcategory === 'string') ? item.subsubcategory.trim() : '',
+                                name: item.name
                             }));
                             if (valid.length === 0) {
-                                alert('没有找到有效的词缀数据');
+                                alert('没有找到有效的词条数据');
                                 return;
                             }
-                            if (!confirm(`即将导入 ${valid.length} 条词缀。\n当前已有 ${affixes.length} 条。是否继续？`)) return;
+                            if (!confirm(`即将导入 ${valid.length} 条词条。\n当前已有 ${affixes.length} 条。是否继续？`)) return;
                             affixes = affixes.concat(valid);
                             // 同步导入的分类到独立 categories 结构
                             valid.forEach(item => {
-                                ensureCategory(item.category, item.subcategory || null);
+                                ensureCategory(item.category, item.subcategory || null, item.subsubcategory || null);
                             });
                             saveToStorage();
                             render();
@@ -1410,6 +1655,7 @@
                     if (btn.dataset.cat === undefined) return;
                     currentCat = btn.dataset.cat;
                     currentSub = '__all__';
+                    currentSubSub = '__all__';
                     render();
                 });
 
@@ -1419,6 +1665,16 @@
                     if (!btn) return;
                     if (btn.dataset.sub === undefined) return;
                     currentSub = btn.dataset.sub;
+                    currentSubSub = '__all__';
+                    render();
+                });
+
+                // 三级分类点击
+                subsubcatRow.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.subsubcat-btn');
+                    if (!btn) return;
+                    if (btn.dataset.subsub === undefined) return;
+                    currentSubSub = btn.dataset.subsub;
                     render();
                 });
 
